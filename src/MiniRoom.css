@@ -1,0 +1,624 @@
+/* 전체 레이아웃 */
+.sns-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: 'Arial', sans-serif;
+    padding: 20px;
+    background-color: #f4f4f4;
+    min-height: 100vh;
+  }
+  
+  /* 미니룸 외곽 프레임 */
+  .room-frame {
+    width: 300px;
+    height: 300px;
+    border: 4px solid #333;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+    position: relative;
+    background-color: white;
+  }
+  
+  /* 벽 (배경색이 바뀌는 부분) */
+  .room-wall {
+    width: 100%;
+    height: 70%; /* 위쪽 70%는 벽 */
+    transition: background-color 0.3s ease; /* 색상 변경 시 부드럽게 */
+    position: relative;
+  }
+  
+  /* 바닥 */
+  .room-floor {
+    width: 100%;
+    height: 30%; /* 아래쪽 30%는 바닥 */
+    background: repeating-linear-gradient(
+      45deg,
+      #deb887,
+      #deb887 10px,
+      #d2b48c 10px,
+      #d2b48c 20px
+    );
+    position: absolute;
+    bottom: -43%; /* 벽 div 안에 위치를 잡기 위해 조정 */
+    left: 0;
+  }
+  
+  /* 아바타 */
+  .avatar {
+    font-size: 80px;
+    position: absolute;
+    bottom: -30px; /* 바닥 위에 서 있는 것처럼 위치 조정 */
+    left: 50%;
+    transform: translateX(-50%);
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  
+  .avatar:hover {
+    transform: translateX(-50%) scale(1.1); /* 마우스 올리면 커짐 */
+  }
+  
+  /* 컨트롤 패널 */
+  .controls {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    text-align: center;
+  }
+  
+  .control-group {
+    margin-bottom: 15px;
+  }
+  
+  button {
+    margin: 0 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+    border: 1px solid #ddd;
+    background: #fff;
+    border-radius: 4px;
+  }
+  
+  button:hover {
+    background-color: #eee;
+  }
+
+/* --- 피드 영역 스타일 --- */
+.feed-section {
+  width: 100%;
+  max-width: 400px; /* 피드는 너무 넓지 않게 */
+  margin-top: 30px;
+  background: white;
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+.feed-section h3 {
+  margin-top: 0;
+  color: #555;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 10px;
+}
+
+/* 입력창 스타일 */
+.input-box {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.input-box input {
+  flex: 1; /* 남은 공간 꽉 채우기 */
+  padding: 10px;
+  border: 2px solid #eee;
+  border-radius: 8px;
+  outline: none;
+}
+
+.input-box input:focus {
+  border-color: #deb887; /* 포커스시 바닥 색상과 맞춤 */
+}
+
+.input-box button {
+  background-color: #333;
+  color: white;
+  font-weight: bold;
+}
+
+/* 게시글 카드 스타일 */
+.post-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.post-card {
+  display: flex;
+  align-items: center;
+  background: #f9f9f9;
+  padding: 10px;
+  border-radius: 10px;
+  animation: fadeIn 0.5s ease; /* 글 등록 시 부드럽게 등장 */
+}
+
+.post-avatar {
+  font-size: 30px;
+  margin-right: 15px;
+  background: white;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.post-content {
+  text-align: left;
+}
+
+.post-text {
+  margin: 0 0 5px 0;
+  font-weight: bold;
+  color: #333;
+}
+
+.post-time {
+  font-size: 12px;
+  color: #999;
+}
+
+/* 애니메이션 효과 */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- 새로 추가된 스타일 --- */
+
+/* 파일 업로드 버튼 꾸미기 */
+.file-upload-btn {
+  font-size: 20px;
+  cursor: pointer;
+  padding: 5px 10px;
+  display: flex;
+  align-items: center;
+}
+
+.file-upload-btn input {
+  display: none; /* 못생긴 기본 파일 버튼 숨기기 */
+}
+
+.file-upload-btn:hover {
+  background-color: #eee;
+  border-radius: 5px;
+}
+
+.file-preview {
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 10px;
+  padding-left: 10px;
+}
+
+/* 게시글 카드 내부 레이아웃 */
+.post-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  width: 100%;
+}
+
+.post-info {
+  flex: 1; /* 남은 공간 차지 */
+  display: flex;
+  flex-direction: column;
+  margin-left: 10px;
+}
+
+.delete-btn {
+  background: none;
+  border: none;
+  font-size: 16px;
+  color: #aaa;
+  cursor: pointer;
+}
+
+.delete-btn:hover {
+  color: red;
+  background: none;
+}
+
+/* 업로드된 이미지 스타일 */
+.post-image {
+  width: 100%;
+  max-height: 300px;
+  object-fit: cover; /* 비율 유지하며 꽉 채우기 */
+  border-radius: 8px;
+  margin-top: 10px;
+  border: 1px solid #eee;
+}
+
+/* 좋아요 버튼 영역 */
+.post-actions {
+  margin-top: 10px;
+  border-top: 1px solid #eee;
+  padding-top: 10px;
+  text-align: left;
+}
+
+.like-btn {
+  background: none;
+  border: none;
+  color: #555;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.like-btn.active {
+  color: #e91e63; /* 좋아요 누르면 핑크색 */
+  font-weight: bold;
+}
+
+.like-btn:hover {
+  background-color: #ffe4e1;
+}
+
+/* --- 전체 레이아웃 (가로 배치) --- */
+.app-container {
+  display: flex; /* 가로 정렬의 핵심 */
+  min-height: 100vh;
+  background-color: #f4f4f4;
+  font-family: 'Arial', sans-serif;
+}
+
+/* --- 1. 좌측 사이드바 --- */
+.sidebar {
+  width: 200px; /* 고정 너비 */
+  background-color: #fff;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid #eee;
+  position: fixed; /* 스크롤해도 고정되게 */
+  height: 100%;
+  left: 0;
+  top: 0;
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: bold;
+  color: #ff6f61; /* 포인트 컬러 */
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+.menu-list {
+  list-style: none;
+  padding: 0;
+}
+
+.menu-list li {
+  padding: 15px;
+  cursor: pointer;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  font-size: 16px;
+  color: #555;
+  transition: all 0.2s;
+}
+
+.menu-list li:hover {
+  background-color: #f9f9f9;
+}
+
+/* 현재 선택된 메뉴 강조 */
+.menu-list li.active {
+  background-color: #ff6f61;
+  color: white;
+  font-weight: bold;
+}
+
+/* --- 2. 우측 콘텐츠 영역 --- */
+.content-area {
+  margin-left: 200px; /* 사이드바 너비만큼 밀어줌 */
+  flex: 1; /* 남은 공간 다 쓰기 */
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* 내용물 중앙 정렬 */
+}
+
+/* 홈 화면 컨텐츠 (기존 스타일 호환) */
+.home-content {
+  width: 100%;
+  max-width: 500px; /* 너무 넓게 퍼지지 않도록 제한 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* 준비 중 페이지 스타일 */
+.placeholder-page {
+  text-align: center;
+  margin-top: 100px;
+  color: #888;
+}
+
+/* --- (기존 CSS들: 미니룸, 피드 등) --- */
+/* 아래에 이전에 작성했던 .room-frame, .post-card 등의 CSS가 있어야 합니다 */
+/* 만약 없으시다면 이전 단계 CSS를 복구해 주세요 */
+
+.room-frame {
+  width: 300px;
+  height: 300px;
+  border: 4px solid #333;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+  position: relative;
+  background-color: white;
+}
+
+/* ... 나머지 기존 스타일들 ... */
+
+/* --- 공통 스타일 --- */
+.tab-content {
+  width: 100%;
+  max-width: 600px;
+  background: white;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  animation: fadeIn 0.3s ease;
+}
+
+.tab-content h2 {
+  color: #ff6f61;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+/* 1. 📷 앨범 스타일 (격자무늬) */
+.photo-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 한 줄에 3개씩 */
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.photo-item {
+  background: #f9f9f9;
+  padding: 10px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.photo-item img {
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 5px;
+}
+
+.upload-btn-box {
+  background: #eee;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  display: inline-block;
+  font-weight: bold;
+}
+
+/* 2. 📒 다이어리 스타일 */
+.diary-input {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+  background: #fff8dc; /* 노란 노트 느낌 */
+  padding: 15px;
+  border-radius: 10px;
+}
+
+.diary-input textarea {
+  height: 80px;
+  resize: none;
+  padding: 10px;
+  border: 1px solid #ddd;
+}
+
+.diary-card {
+  border-left: 4px solid #ff6f61;
+  background: #f9f9f9;
+  padding: 15px;
+  margin-bottom: 10px;
+  text-align: left;
+}
+
+.diary-date {
+  font-size: 12px;
+  color: #888;
+  display: block;
+  margin-bottom: 5px;
+}
+
+/* 3. 📝 방명록 스타일 */
+.guestbook-input {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.guestbook-input input {
+  padding: 10px;
+  border: 1px solid #eee;
+  border-radius: 5px;
+}
+
+.guestbook-list {
+  list-style: none;
+  padding: 0;
+}
+
+.guestbook-item {
+  border-bottom: 1px dashed #ddd;
+  padding: 10px 0;
+  text-align: left;
+}
+/* --- 💬 메신저 스타일 --- */
+.messenger-container {
+  display: flex;
+  padding: 0; /* 기존 패딩 제거하고 꽉 채우기 */
+  overflow: hidden; /* 둥근 모서리 유지 */
+  height: 500px; /* 전체 높이 고정 */
+}
+
+/* 왼쪽 사이드바 (친구 목록) */
+.chat-sidebar {
+  width: 150px;
+  background-color: #fcfcfc;
+  border-right: 1px solid #eee;
+  padding: 15px;
+}
+
+.chat-sidebar h3 {
+  font-size: 16px;
+  margin-top: 0;
+  margin-bottom: 15px;
+}
+
+.friend-item {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 8px;
+  margin-bottom: 5px;
+  transition: background 0.2s;
+}
+
+.friend-item:hover {
+  background-color: #f0f0f0;
+}
+
+.friend-item.active {
+  background-color: #e0ffff; /* 선택된 친구 강조 */
+}
+
+.friend-avatar {
+  font-size: 24px;
+  margin-right: 10px;
+}
+
+.friend-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.friend-name {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.friend-status {
+  font-size: 11px;
+  color: #888;
+}
+
+/* 오른쪽 채팅방 영역 */
+.chat-room {
+  flex: 1; /* 남은 공간 다 쓰기 */
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-header {
+  padding: 15px;
+  border-bottom: 1px solid #eee;
+  background-color: #fff;
+  font-weight: bold;
+}
+
+/* 메시지들이 쌓이는 공간 */
+.chat-messages {
+  flex: 1;
+  padding: 20px;
+  background-color: #f1f2f6; /* 카톡 같은 연한 배경 */
+  overflow-y: auto; /* 내용 넘치면 스크롤 */
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* 말풍선 공통 스타일 */
+.message-bubble {
+  max-width: 70%;
+  padding: 10px 15px;
+  border-radius: 15px;
+  font-size: 14px;
+  line-height: 1.4;
+  position: relative;
+  animation: fadeIn 0.2s ease;
+}
+
+/* 상대방 말풍선 (왼쪽, 흰색) */
+.message-bubble.them {
+  align-self: flex-start;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-top-left-radius: 2px;
+}
+
+/* 내 말풍선 (오른쪽, 노란색) */
+.message-bubble.me {
+  align-self: flex-end;
+  background-color: #ffeb33; /* 카톡 노란색 */
+  border-top-right-radius: 2px;
+}
+
+/* 입력창 영역 */
+.chat-input-area {
+  padding: 15px;
+  background-color: white;
+  border-top: 1px solid #eee;
+  display: flex;
+  gap: 10px;
+}
+
+.chat-input-area input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  outline: none;
+}
+
+.chat-input-area button {
+  background-color: #ffeb33;
+  border: none;
+  padding: 0 20px;
+  border-radius: 20px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.chat-input-area button:hover {
+  background-color: #fdd835;
+}
+
+.no-msg {
+  text-align: center;
+  color: #999;
+  margin-top: 50px;
+}
