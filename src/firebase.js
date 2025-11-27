@@ -5,8 +5,8 @@ import { getFirestore } from "firebase/firestore";
 // (apiKey, authDomain, projectId 등이 포함된 객체입니다)
 const firebaseConfig = {
   apiKey: "AIzaSyCJy_KNwAia5wXeWfIDYuig7xkbK7x9JWE", 
-  authDomain: "my-mini-sns.firebaseapp.com",
-  projectId: "my-mini-sns",
+  authDomain: "my-mini-sns2.firebaseapp.com",
+  projectId: "my-mini-sns2",
   storageBucket: "my-mini-sns2.firebasestorage.app",
   messagingSenderId: "19426165188",
   appId: "1:19426165188:web:b15ad9f2bc1dec83ffa491",
