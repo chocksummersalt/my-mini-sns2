@@ -123,72 +123,83 @@ const Guestbook = () => {
 };
 
 // ==========================================
-// 5. 💬 메신저 컴포넌트 (모바일 최적화)
+// 5. 💬 메신저 컴포넌트 (저장 오류 해결 버전)
 // ==========================================
 const Messenger = () => {
+  // 친구 목록 (ID를 모두 따옴표로 감싸서 문자열로 만듦)
   const friends = [
-    { id: 1, name: "전체 채팅방", avatar: "📢", status: "누구나 환영" },
-    { id: 2, name: "김코딩", avatar: "💻", status: "부재중" },
-    { id: 3, name: "댄스강사", avatar: "💃", status: "오프라인" },
+    { id: "1", name: "전체 채팅방", avatar: "📢", status: "누구나 환영" },
+    { id: "2", name: "김코딩", avatar: "💻", status: "부재중" },
+    { id: "3", name: "댄스강사", avatar: "💃", status: "오프라인" },
   ];
 
-  const [activeChatId, setActiveChatId] = useState(1);
+  const [activeChatId, setActiveChatId] = useState("1"); // 기본값도 문자열 "1"
   const [inputMsg, setInputMsg] = useState("");
   const [chatLogs, setChatLogs] = useState([]);
-  
-  // 모바일용: 친구 목록이 열렸는지 확인하는 상태 (false면 채팅방, true면 친구목록)
   const [showSidebar, setShowSidebar] = useState(false);
 
-  // 내 임시 ID
-  const [myId] = useState(() => "user_" + Math.random().toString(36).substr(2, 9));
+  // 내 ID (새로고침 해도 안 바뀌게 로컬스토리지에 저장)
+  const [myId] = useState(() => {
+    const savedId = localStorage.getItem('my_chat_id');
+    if (savedId) return savedId;
+    const newId = "user_" + Math.random().toString(36).substr(2, 9);
+    localStorage.setItem('my_chat_id', newId);
+    return newId;
+  });
 
-  // 1. 실시간 데이터 듣기
+  // 1. 실시간 데이터 듣기 (DB에서 불러오기)
   React.useEffect(() => {
+    // 쿼리 조건: roomId가 현재 방 ID와 같은 것만 가져오기
+    // (만약 에러가 난다면 인덱스 문제일 수 있으므로 orderBy를 잠시 뺄 수도 있음)
     const q = query(
       collection(db, "messages"),
       where("roomId", "==", activeChatId),
-      orderBy("createdAt", "asc")
+      orderBy("createdAt", "asc") 
     );
+
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const newMessages = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const newMessages = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      console.log("불러온 메시지 개수:", newMessages.length); // 확인용 로그
       setChatLogs(newMessages);
     });
+
     return () => unsubscribe();
   }, [activeChatId]);
 
-  // 2. 메시지 보내기
+  // 2. 메시지 보내기 (DB에 저장하기)
   const sendMessage = async () => {
     if (!inputMsg.trim()) return;
+
     try {
       await addDoc(collection(db, "messages"), {
-        roomId: activeChatId,
+        roomId: activeChatId, // 문자열 ID로 저장됨
         text: inputMsg,
         senderId: myId,
         createdAt: serverTimestamp(),
       });
       setInputMsg("");
     } catch (error) {
-      console.error("전송 실패:", error);
+      console.error("전송 실패! (권한 문제인지 확인):", error);
+      alert("전송 실패! 콘솔창(F12)을 확인해주세요.");
     }
   };
 
   const currentFriend = friends.find(f => f.id === activeChatId) || friends[0];
 
-  // 친구 선택 시 실행되는 함수
   const handleFriendSelect = (id) => {
-    setActiveChatId(id);    // 1. 채팅방 변경
-    setShowSidebar(false);  // 2. 목록 닫고 채팅방 보여주기
+    setActiveChatId(id);
+    setShowSidebar(false);
   };
 
   return (
-    // showSidebar 상태에 따라 클래스 이름을 다르게 줌
     <div className={`tab-content messenger-container ${showSidebar ? 'sidebar-open' : ''}`}>
-      
-      {/* 친구 목록 (사이드바) */}
+      {/* 사이드바 (친구목록) */}
       <div className="chat-sidebar">
         <h3>
-          💬 대화상대 선택
-          {/* 모바일에서만 보이는 닫기 버튼 */}
+          💬 대화상대
           <button className="mobile-close-btn" onClick={() => setShowSidebar(false)}>✖</button>
         </h3>
         <ul>
@@ -208,22 +219,18 @@ const Messenger = () => {
         </ul>
       </div>
 
-      {/* 채팅창 */}
+      {/* 채팅방 */}
       <div className="chat-room">
         <div className="chat-header">
           <span className="header-title">
             {currentFriend.avatar} <strong>{currentFriend.name}</strong>
           </span>
-          
-          {/* 우측 상단 친구목록 토글 버튼 (모바일용) */}
-          <button className="mobile-menu-btn" onClick={() => setShowSidebar(true)}>
-            👥 목록
-          </button>
+          <button className="mobile-menu-btn" onClick={() => setShowSidebar(true)}>👥 목록</button>
         </div>
         
         <div className="chat-messages">
           {chatLogs.length === 0 ? (
-            <p className="no-msg">대화를 시작해보세요!</p>
+            <p className="no-msg">대화 내용이 없습니다.</p>
           ) : (
             chatLogs.map((msg) => (
               <div key={msg.id} className={`message-bubble ${msg.senderId === myId ? 'me' : 'them'}`}>
