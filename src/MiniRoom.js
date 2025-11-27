@@ -274,9 +274,11 @@ const MiniRoom = () => {
       {/* 우측 콘텐츠 영역 */}
       <main className="content-area">
         
-        {/* 1. 홈 탭 */}
-        {activeTab === 'home' && (
+{/* 1. 홈 탭 */}
+{activeTab === 'home' && (
           <div className="home-content">
+            
+            {/* 미니룸 프레임 (버튼 없음) */}
             <div className="room-frame">
               <div 
                 className="room-wall" 
@@ -291,15 +293,29 @@ const MiniRoom = () => {
               </div>
             </div>
 
+            {/* --- 컨트롤 패널 (2단 구성) --- */}
             <div className="controls">
-               <button onClick={() => setWallColor('#ffe4e1')}>분홍</button>
-               <label className="file-upload-btn" style={{display:'inline-block', border:'1px solid #ccc', padding:'2px 5px', fontSize:'12px', cursor:'pointer'}}>
-                 배경변경 <input type="file" onChange={handleBgUpload} style={{display:'none'}} />
-               </label>
-               <button onClick={() => setAvatar('🧑‍💻')}>나</button>
-               <button onClick={() => setAvatar('🐱')}>냥이</button>
+               {/* 윗줄: 색상 및 아바타 변경 버튼들 */}
+               <div className="control-row top-row">
+                  <span>벽지: </span>
+                  <button onClick={() => setWallColor('#ffe4e1')}>분홍</button>
+                  <button onClick={() => setWallColor('#e0ffff')}>하늘</button>
+                  <span className="divider">|</span>
+                  <span>아바타: </span>
+                  <button onClick={() => setAvatar('🧑‍💻')}>나</button>
+                  <button onClick={() => setAvatar('🐱')}>냥이</button>
+               </div>
+
+               {/* 아랫줄: 배경 변경 버튼 (중앙 배치) */}
+               <div className="control-row bottom-row">
+                 <label className="custom-file-btn">
+                   📷 내 사진으로 배경 꾸미기
+                   <input type="file" onChange={handleBgUpload} accept="image/*" />
+                 </label>
+               </div>
             </div>
 
+            {/* ... (이하 피드 영역은 그대로 유지) ... */}
             <div className="feed-section">
               <h3>📢 뉴스피드</h3>
               <div className="input-box">
