@@ -1,11 +1,21 @@
 import React, { useState, useRef } from 'react';
 import './MiniRoom.css';
-// 기존 import 아래에 추가
-import { db } from './firebase'; // 방금 만든 설정 파일
-import { collection, addDoc, query, orderBy, onSnapshot, where, serverTimestamp } from 'firebase/firestore';
+import { db } from './firebase'; 
+import { 
+  collection, 
+  addDoc, 
+  query, 
+  orderBy, 
+  onSnapshot, 
+  serverTimestamp, 
+  updateDoc, 
+  deleteDoc, 
+  doc,
+  where
+} from 'firebase/firestore';
 
 // ==========================================
-// 1. 📷 앨범 컴포넌트 (사진첩)
+// 1. 📷 앨범 컴포넌트
 // ==========================================
 const Album = () => {
   const [photos, setPhotos] = useState([
@@ -46,7 +56,7 @@ const Album = () => {
 };
 
 // ==========================================
-// 2. 📒 다이어리 컴포넌트 (일기장)
+// 2. 📒 다이어리 컴포넌트
 // ==========================================
 const Diary = () => {
   const [entries, setEntries] = useState([
@@ -87,7 +97,7 @@ const Diary = () => {
 };
 
 // ==========================================
-// 3. 📝 방명록 컴포넌트 (친구들의 글)
+// 3. 📝 방명록 컴포넌트
 // ==========================================
 const Guestbook = () => {
   const [messages, setMessages] = useState([
@@ -123,22 +133,20 @@ const Guestbook = () => {
 };
 
 // ==========================================
-// 5. 💬 메신저 컴포넌트 (저장 오류 해결 버전)
+// 4. 💬 메신저 컴포넌트
 // ==========================================
 const Messenger = () => {
-  // 친구 목록 (ID를 모두 따옴표로 감싸서 문자열로 만듦)
   const friends = [
     { id: "1", name: "전체 채팅방", avatar: "📢", status: "누구나 환영" },
     { id: "2", name: "김코딩", avatar: "💻", status: "부재중" },
     { id: "3", name: "댄스강사", avatar: "💃", status: "오프라인" },
   ];
 
-  const [activeChatId, setActiveChatId] = useState("1"); // 기본값도 문자열 "1"
+  const [activeChatId, setActiveChatId] = useState("1");
   const [inputMsg, setInputMsg] = useState("");
   const [chatLogs, setChatLogs] = useState([]);
   const [showSidebar, setShowSidebar] = useState(false);
 
-  // 내 ID (새로고침 해도 안 바뀌게 로컬스토리지에 저장)
   const [myId] = useState(() => {
     const savedId = localStorage.getItem('my_chat_id');
     if (savedId) return savedId;
@@ -147,10 +155,7 @@ const Messenger = () => {
     return newId;
   });
 
-  // 1. 실시간 데이터 듣기 (DB에서 불러오기)
   React.useEffect(() => {
-    // 쿼리 조건: roomId가 현재 방 ID와 같은 것만 가져오기
-    // (만약 에러가 난다면 인덱스 문제일 수 있으므로 orderBy를 잠시 뺄 수도 있음)
     const q = query(
       collection(db, "messages"),
       where("roomId", "==", activeChatId),
@@ -162,28 +167,24 @@ const Messenger = () => {
         id: doc.id,
         ...doc.data()
       }));
-      console.log("불러온 메시지 개수:", newMessages.length); // 확인용 로그
       setChatLogs(newMessages);
     });
 
     return () => unsubscribe();
   }, [activeChatId]);
 
-  // 2. 메시지 보내기 (DB에 저장하기)
   const sendMessage = async () => {
     if (!inputMsg.trim()) return;
-
     try {
       await addDoc(collection(db, "messages"), {
-        roomId: activeChatId, // 문자열 ID로 저장됨
+        roomId: activeChatId,
         text: inputMsg,
         senderId: myId,
         createdAt: serverTimestamp(),
       });
       setInputMsg("");
     } catch (error) {
-      console.error("전송 실패! (권한 문제인지 확인):", error);
-      alert("전송 실패! 콘솔창(F12)을 확인해주세요.");
+      console.error("전송 실패:", error);
     }
   };
 
@@ -196,7 +197,6 @@ const Messenger = () => {
 
   return (
     <div className={`tab-content messenger-container ${showSidebar ? 'sidebar-open' : ''}`}>
-      {/* 사이드바 (친구목록) */}
       <div className="chat-sidebar">
         <h3>
           💬 대화상대
@@ -219,7 +219,6 @@ const Messenger = () => {
         </ul>
       </div>
 
-      {/* 채팅방 */}
       <div className="chat-room">
         <div className="chat-header">
           <span className="header-title">
@@ -254,28 +253,66 @@ const Messenger = () => {
     </div>
   );
 };
+
 // ==========================================
-// 4. 🏠 메인 미니룸 컴포넌트 (통합)
+// 5. 🏠 메인 미니룸 컴포넌트 (통합)
 // ==========================================
 const MiniRoom = () => {
   const [activeTab, setActiveTab] = useState('home'); 
   
-  // 미니룸 상태
+  // 미니룸 꾸미기 상태
   const [wallColor, setWallColor] = useState('#ffe4e1');
   const [avatar, setAvatar] = useState('🧑‍💻');
   const [bgImage, setBgImage] = useState(null);
 
   // 피드 상태
   const [inputText, setInputText] = useState('');
-  const [posts, setPosts] = useState([
-    { id: 1, text: "미니룸 오픈! 환영합니다.", author: "🧑‍💻", time: "방금 전", likes: 0, isLiked: false }
-  ]);
+  const [posts, setPosts] = useState([]);
 
-  const handlePostSubmit = () => {
+  // 1. 피드 데이터 가져오기 (Read)
+  React.useEffect(() => {
+    const q = query(
+      collection(db, "feeds"),
+      orderBy("createdAt", "desc") 
+    );
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const newPosts = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setPosts(newPosts);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  // 2. 글 작성하기 (Create)
+  const handlePostSubmit = async () => {
     if (inputText.trim() === '') return;
-    const newPost = { id: Date.now(), text: inputText, author: avatar, time: "방금", likes: 0, isLiked: false };
-    setPosts([newPost, ...posts]);
-    setInputText('');
+    try {
+      await addDoc(collection(db, "feeds"), {
+        text: inputText,
+        author: avatar,
+        createdAt: serverTimestamp(),
+        likes: 0,
+      });
+      setInputText('');
+    } catch (error) {
+      console.error("글 작성 실패:", error);
+    }
+  };
+
+  // 3. 좋아요 (Update)
+  const handleLike = async (id, currentLikes) => {
+    const postRef = doc(db, "feeds", id);
+    await updateDoc(postRef, { likes: currentLikes + 1 });
+  };
+
+  // 4. 삭제 (Delete)
+  const handleDelete = async (id) => {
+    if(window.confirm("정말 삭제하시겠습니까?")) {
+      const postRef = doc(db, "feeds", id);
+      await deleteDoc(postRef);
+    }
   };
 
   const handleBgUpload = (e) => {
@@ -286,7 +323,6 @@ const MiniRoom = () => {
   return (
     <div className="app-container">
       {/* 좌측 사이드바 */}
-      {/* --- 1. 좌측 사이드바 (모바일에서는 상단+하단으로 분리됨) --- */}
       <nav className="sidebar">
         <div className="logo">My SNS</div>
         <ul className="menu-list">
@@ -300,21 +336,20 @@ const MiniRoom = () => {
             📒 <span className="menu-text">다이어리</span>
           </li>
           <li className={activeTab === 'guestbook' ? 'active' : ''} onClick={() => setActiveTab('guestbook')}>
-            📝 <span className="menu-text">방명록</span>
+             📝 <span className="menu-text">방명록</span>
           </li>
           <li className={activeTab === 'messenger' ? 'active' : ''} onClick={() => setActiveTab('messenger')}>
-            💬 <span className="menu-text">메신저</span>
+             💬 <span className="menu-text">메신저</span>
           </li>
         </ul>
       </nav>
+
       {/* 우측 콘텐츠 영역 */}
       <main className="content-area">
         
-{/* 1. 홈 탭 */}
-{activeTab === 'home' && (
+        {/* 1. 홈 탭 */}
+        {activeTab === 'home' && (
           <div className="home-content">
-            
-            {/* 미니룸 프레임 (버튼 없음) */}
             <div className="room-frame">
               <div 
                 className="room-wall" 
@@ -329,9 +364,8 @@ const MiniRoom = () => {
               </div>
             </div>
 
-            {/* --- 컨트롤 패널 (2단 구성) --- */}
+            {/* 컨트롤 패널 (2단 구성) */}
             <div className="controls">
-               {/* 윗줄: 색상 및 아바타 변경 버튼들 */}
                <div className="control-row top-row">
                   <span>벽지: </span>
                   <button onClick={() => setWallColor('#ffe4e1')}>분홍</button>
@@ -341,28 +375,49 @@ const MiniRoom = () => {
                   <button onClick={() => setAvatar('🧑‍💻')}>나</button>
                   <button onClick={() => setAvatar('🐱')}>냥이</button>
                </div>
-
-               {/* 아랫줄: 배경 변경 버튼 (중앙 배치) */}
                <div className="control-row bottom-row">
                  <label className="custom-file-btn">
-                   📷 내 사진으로 배경 꾸미기
+                   📷 배경 꾸미기
                    <input type="file" onChange={handleBgUpload} accept="image/*" />
                  </label>
                </div>
             </div>
 
-            {/* ... (이하 피드 영역은 그대로 유지) ... */}
+            {/* 뉴스피드 (공유 기능) */}
             <div className="feed-section">
-              <h3>📢 뉴스피드</h3>
+              <h3>📢 뉴스피드 (전체 공유)</h3>
               <div className="input-box">
-                <input value={inputText} onChange={(e) => setInputText(e.target.value)} placeholder="무슨 생각 하세요?" />
+                <input 
+                  value={inputText} 
+                  onChange={(e) => setInputText(e.target.value)} 
+                  onKeyPress={(e) => e.key === 'Enter' && handlePostSubmit()}
+                  placeholder="모두와 공유할 이야기를 남겨보세요..." 
+                />
                 <button onClick={handlePostSubmit}>등록</button>
               </div>
+              
               <div className="post-list">
                 {posts.map(p => (
                   <div key={p.id} className="post-card">
-                    <span style={{marginRight:'10px'}}>{p.author}</span>
-                    <span>{p.text}</span>
+                    <div className="post-header">
+                      <div className="post-avatar">{p.author}</div>
+                      <div className="post-info">
+                        <span className="post-time">
+                          {p.createdAt?.seconds 
+                            ? new Date(p.createdAt.seconds * 1000).toLocaleTimeString() 
+                            : '방금 전'}
+                        </span>
+                      </div>
+                      <button className="delete-btn" onClick={() => handleDelete(p.id)}>🗑️</button>
+                    </div>
+                    <div className="post-content">
+                      <p className="post-text">{p.text}</p>
+                    </div>
+                    <div className="post-actions">
+                      <button className="like-btn" onClick={() => handleLike(p.id, p.likes)}>
+                        ❤️ 좋아요 {p.likes}
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -370,7 +425,7 @@ const MiniRoom = () => {
           </div>
         )}
 
-        {/* 2. 다른 탭들 연결 */}
+        {/* 다른 탭들 연결 */}
         {activeTab === 'album' && <Album />}
         {activeTab === 'diary' && <Diary />}
         {activeTab === 'guestbook' && <Guestbook />}
