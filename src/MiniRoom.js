@@ -3,6 +3,11 @@ import './MiniRoom.css';
 import { db } from './firebase'; 
 import imageCompression from 'browser-image-compression'; 
 import EmojiPicker from 'emoji-picker-react';
+// firebase.js에서 db뿐만 아니라 storage도 가져옵니다.
+import { db, storage } from './firebase'; 
+
+// 파이어베이스 스토리지 함수들 추가
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 import { 
   collection, 
@@ -297,26 +302,44 @@ const MiniRoom = () => {
   };
 
   // 사진 업로드
-  const handleAvatarUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+// 📷 아바타 사진 업로드 및 리사이징 핸들러 (서버 저장 버전)
+const handleAvatarUpload = async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
 
-    const options = { 
-      maxSizeMB: 0.05, 
-      maxWidthOrHeight: 200,
-      useWebWorker: true
-    };
-
-    try {
-      const compressedFile = await imageCompression(file, options);
-      const url = URL.createObjectURL(compressedFile);
-      setAvatar(url);
-      setIsAvatarImage(true);
-      setShowAvatarSelector(false); // 창 닫기
-    } catch (error) {
-      console.error("이미지 줄이기 실패:", error);
-    }
+  // 1. 이미지 리사이징 (용량 줄이기)
+  const options = { 
+    maxSizeMB: 0.05, 
+    maxWidthOrHeight: 200,
+    useWebWorker: true
   };
+
+  try {
+    const compressedFile = await imageCompression(file, options);
+    
+    // 2. 파이어베이스 스토리지에 업로드하기
+    // 파일 이름이 겹치지 않게 날짜 숫자를 붙입니다.
+    const fileName = `avatars/${Date.now()}_${file.name}`;
+    const storageRef = ref(storage, fileName);
+    
+    // 업로드 시작!
+    await uploadBytes(storageRef, compressedFile);
+    
+    // 3. 업로드된 파일의 "인터넷 주소(URL)" 가져오기
+    const downloadURL = await getDownloadURL(storageRef);
+    
+    console.log("서버에 저장된 주소:", downloadURL); // 확인용
+
+    // 4. 상태 업데이트 (이제 blob: 주소가 아니라 https: 주소가 들어갑니다)
+    setAvatar(downloadURL);
+    setIsAvatarImage(true);
+    setShowAvatarSelector(false); // 창 닫기
+
+  } catch (error) {
+    console.error("이미지 업로드 실패:", error);
+    alert("사진 업로드 중 오류가 발생했습니다.");
+  }
+};
 
   // 배경 업로드
   const handleBgUpload = (e) => {

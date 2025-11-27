@@ -177,10 +177,19 @@
   text-align: left;
 }
 
+/* --- 📢 뉴스피드 본문 텍스트 스타일 --- */
 .post-text {
-  margin: 0 0 5px 0;
-  font-weight: bold;
+  margin: 0;
   color: #333;
+  line-height: 1.5;         /* 줄 간격 적당히 */
+  
+  /* ▼▼▼ 여기가 핵심 수정 사항입니다 ▼▼▼ */
+  width: 100%;              /* 글자가 적어도 가로 공간을 꽉 채우게 함 */
+  white-space: pre-wrap;    /* 엔터(줄바꿈)는 인식하되, 가로로 쭉 나열 */
+  word-break: keep-all;     /* 단어 중간에 끊기지 않게 (한글 최적화) */
+  overflow-wrap: break-word; /* 너무 긴 영어 단어만 줄바꿈 */
+  text-align: left;         /* 왼쪽 정렬 */
+  display: block;           /* 박스 형태로 만들어 가로 차지 */
 }
 
 .post-time {
