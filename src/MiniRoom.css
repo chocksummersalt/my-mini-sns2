@@ -146,18 +146,32 @@
   animation: fadeIn 0.5s ease; /* 글 등록 시 부드럽게 등장 */
 }
 
+/* --- 📢 뉴스피드 게시글 스타일 --- */
+
+/* 아바타 틀 (동그랗고 작은 크기) */
 .post-avatar {
-  font-size: 30px;
+  width: 40px;       /* 고정 너비 (이모티콘과 비슷하게) */
+  height: 40px;      /* 고정 높이 */
+  border-radius: 50%; /* 완전한 원형 */
+  overflow: hidden;   /* 네모난 사진이 튀어나가지 않게 자름 */
   margin-right: 15px;
-  background: white;
-  width: 50px;
-  height: 50px;
+  
+  /* 이모티콘일 때를 위한 중앙 정렬 및 폰트 크기 */
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  font-size: 28px;   /* 이모티콘 크기 조절 */
+  background-color: #f9f9f9; /* 사진 로딩 전 배경색 */
 }
+
+/* 아바타 안에 사진이 들어올 경우 (`img` 태그) */
+.post-avatar img {
+  width: 100%;       /* 틀에 꽉 차게 너비 설정 */
+  height: 100%;      /* 틀에 꽉 차게 높이 설정 */
+  object-fit: cover; /* 비율을 유지하면서 빈틈없이 채우기 */
+}
+
+/* ... (나머지 .post-card, .post-header 등은 그대로 유지) ... */
 
 .post-content {
   text-align: left;
