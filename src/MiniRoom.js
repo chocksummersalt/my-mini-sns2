@@ -123,78 +123,80 @@ const Guestbook = () => {
 };
 
 // ==========================================
-// 5. 💬 메신저 컴포넌트 (파이어베이스 실시간 연동)
+// 5. 💬 메신저 컴포넌트 (모바일 최적화)
 // ==========================================
 const Messenger = () => {
   const friends = [
-    { id: 1, name: "전체 채팅방", avatar: "📢", status: "누구나 환영" }, // 테스트를 위해 1번방을 공용방으로
+    { id: 1, name: "전체 채팅방", avatar: "📢", status: "누구나 환영" },
     { id: 2, name: "김코딩", avatar: "💻", status: "부재중" },
+    { id: 3, name: "댄스강사", avatar: "💃", status: "오프라인" },
   ];
 
   const [activeChatId, setActiveChatId] = useState(1);
   const [inputMsg, setInputMsg] = useState("");
   const [chatLogs, setChatLogs] = useState([]);
   
-  // 내 브라우저 전용 ID 생성 (새로고침 전까지 유지)
-  // 실제로는 로그인한 유저 ID를 써야 하지만, 지금은 임시로 랜덤 ID 사용
+  // 모바일용: 친구 목록이 열렸는지 확인하는 상태 (false면 채팅방, true면 친구목록)
+  const [showSidebar, setShowSidebar] = useState(false);
+
+  // 내 임시 ID
   const [myId] = useState(() => "user_" + Math.random().toString(36).substr(2, 9));
 
-  // --- 1. 실시간 데이터 듣기 (Read) ---
+  // 1. 실시간 데이터 듣기
   React.useEffect(() => {
-    // 'messages'라는 컬렉션에서 -> 현재 방(activeChatId)의 글만 -> 시간순으로 가져오기
     const q = query(
       collection(db, "messages"),
       where("roomId", "==", activeChatId),
       orderBy("createdAt", "asc")
     );
-
-    // 실시간 구독 (onSnapshot)
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const newMessages = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
+      const newMessages = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       setChatLogs(newMessages);
     });
-
-    return () => unsubscribe(); // 채팅방 나갈 때 구독 취소 (메모리 절약)
+    return () => unsubscribe();
   }, [activeChatId]);
 
-// --- 2. 메시지 보내기 (수정됨: 자동응답 제거) ---
-const sendMessage = async () => {
-  if (!inputMsg.trim()) return;
-
-  try {
-    // 파이어베이스 DB에 내 메시지 저장하기
-    await addDoc(collection(db, "messages"), {
-      roomId: activeChatId,
-      text: inputMsg,
-      senderId: myId, // 내가 보냈다는 표시
-      createdAt: serverTimestamp(), // 서버 시간
-    });
-    
-    setInputMsg(""); // 입력창 비우기
-    
-    // ❌ 중요: 여기에 있던 setTimeout 코드는 삭제되었습니다! ❌
-
-  } catch (error) {
-    console.error("전송 실패:", error);
-  }
-};
+  // 2. 메시지 보내기
+  const sendMessage = async () => {
+    if (!inputMsg.trim()) return;
+    try {
+      await addDoc(collection(db, "messages"), {
+        roomId: activeChatId,
+        text: inputMsg,
+        senderId: myId,
+        createdAt: serverTimestamp(),
+      });
+      setInputMsg("");
+    } catch (error) {
+      console.error("전송 실패:", error);
+    }
+  };
 
   const currentFriend = friends.find(f => f.id === activeChatId) || friends[0];
 
+  // 친구 선택 시 실행되는 함수
+  const handleFriendSelect = (id) => {
+    setActiveChatId(id);    // 1. 채팅방 변경
+    setShowSidebar(false);  // 2. 목록 닫고 채팅방 보여주기
+  };
+
   return (
-    <div className="tab-content messenger-container">
-      {/* 친구 목록 */}
+    // showSidebar 상태에 따라 클래스 이름을 다르게 줌
+    <div className={`tab-content messenger-container ${showSidebar ? 'sidebar-open' : ''}`}>
+      
+      {/* 친구 목록 (사이드바) */}
       <div className="chat-sidebar">
-        <h3>💬 채팅목록</h3>
+        <h3>
+          💬 대화상대 선택
+          {/* 모바일에서만 보이는 닫기 버튼 */}
+          <button className="mobile-close-btn" onClick={() => setShowSidebar(false)}>✖</button>
+        </h3>
         <ul>
           {friends.map(friend => (
             <li 
               key={friend.id} 
               className={`friend-item ${activeChatId === friend.id ? 'active' : ''}`}
-              onClick={() => setActiveChatId(friend.id)}
+              onClick={() => handleFriendSelect(friend.id)}
             >
               <span className="friend-avatar">{friend.avatar}</span>
               <div className="friend-info">
@@ -209,18 +211,22 @@ const sendMessage = async () => {
       {/* 채팅창 */}
       <div className="chat-room">
         <div className="chat-header">
-          <span>{currentFriend.avatar} <strong>{currentFriend.name}</strong></span>
+          <span className="header-title">
+            {currentFriend.avatar} <strong>{currentFriend.name}</strong>
+          </span>
+          
+          {/* 우측 상단 친구목록 토글 버튼 (모바일용) */}
+          <button className="mobile-menu-btn" onClick={() => setShowSidebar(true)}>
+            👥 목록
+          </button>
         </div>
         
         <div className="chat-messages">
           {chatLogs.length === 0 ? (
-            <p className="no-msg">첫 메시지를 남겨보세요!</p>
+            <p className="no-msg">대화를 시작해보세요!</p>
           ) : (
             chatLogs.map((msg) => (
-              <div 
-                key={msg.id} 
-                className={`message-bubble ${msg.senderId === myId ? 'me' : 'them'}`}
-              >
+              <div key={msg.id} className={`message-bubble ${msg.senderId === myId ? 'me' : 'them'}`}>
                 {msg.text}
               </div>
             ))
@@ -241,7 +247,6 @@ const sendMessage = async () => {
     </div>
   );
 };
-
 // ==========================================
 // 4. 🏠 메인 미니룸 컴포넌트 (통합)
 // ==========================================
