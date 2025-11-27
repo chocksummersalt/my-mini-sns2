@@ -160,22 +160,27 @@ const Messenger = () => {
     return () => unsubscribe(); // 채팅방 나갈 때 구독 취소 (메모리 절약)
   }, [activeChatId]);
 
-  // --- 2. 메시지 보내기 (Create) ---
-  const sendMessage = async () => {
-    if (!inputMsg.trim()) return;
+// --- 2. 메시지 보내기 (수정됨: 자동응답 제거) ---
+const sendMessage = async () => {
+  if (!inputMsg.trim()) return;
 
-    try {
-      await addDoc(collection(db, "messages"), {
-        roomId: activeChatId,
-        text: inputMsg,
-        senderId: myId, // 내가 보냈다는 표시
-        createdAt: serverTimestamp(), // 서버 시간 기준
-      });
-      setInputMsg(""); // 입력창 비우기
-    } catch (error) {
-      console.error("전송 실패:", error);
-    }
-  };
+  try {
+    // 파이어베이스 DB에 내 메시지 저장하기
+    await addDoc(collection(db, "messages"), {
+      roomId: activeChatId,
+      text: inputMsg,
+      senderId: myId, // 내가 보냈다는 표시
+      createdAt: serverTimestamp(), // 서버 시간
+    });
+    
+    setInputMsg(""); // 입력창 비우기
+    
+    // ❌ 중요: 여기에 있던 setTimeout 코드는 삭제되었습니다! ❌
+
+  } catch (error) {
+    console.error("전송 실패:", error);
+  }
+};
 
   const currentFriend = friends.find(f => f.id === activeChatId) || friends[0];
 
