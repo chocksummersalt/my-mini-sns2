@@ -702,3 +702,68 @@
     height: calc(100vh - 150px); /* 모바일 화면에 맞게 */
   }
 }
+/* --- 컨트롤 패널 2단 레이아웃 스타일 --- */
+.controls {
+  background: white;
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  text-align: center;
+  margin-bottom: 20px;
+  width: 100%;
+  max-width: 400px; /* 컨트롤 패널 너비 제한 */
+}
+
+/* 각 줄의 간격 */
+.control-row {
+  margin-bottom: 15px;
+}
+
+.control-row.bottom-row {
+  margin-bottom: 0; /* 마지막 줄은 여백 제거 */
+  border-top: 1px dashed #eee; /* 윗줄과 구분선 */
+  padding-top: 15px;
+}
+
+/* 구분선 스타일 (|) */
+.divider {
+  margin: 0 10px;
+  color: #ddd;
+}
+
+/* 윗줄 버튼들 스타일 미세 조정 */
+.top-row button {
+  margin: 0 3px;
+  padding: 5px 10px;
+  cursor: pointer;
+  border: 1px solid #ddd;
+  background: #fff;
+  border-radius: 5px;
+  font-size: 13px;
+}
+
+.top-row button:hover {
+  background-color: #f0f0f0;
+}
+
+/* 아랫줄: 배경 변경 버튼 스타일 */
+.custom-file-btn {
+  display: inline-block; /* 중앙 정렬을 위해 */
+  background-color: #ff6f61; /* 포인트 컬러 (산호색) */
+  color: white;
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s;
+  box-shadow: 0 2px 5px rgba(255, 111, 97, 0.3);
+}
+
+.custom-file-btn:hover {
+  background-color: #ff5240; /* 마우스 올리면 더 진하게 */
+}
+
+.custom-file-btn input {
+  display: none; /* 못생긴 기본 파일 버튼 숨기기 */
+}
