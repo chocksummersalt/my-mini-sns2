@@ -250,17 +250,27 @@ const MiniRoom = () => {
   return (
     <div className="app-container">
       {/* 좌측 사이드바 */}
+      {/* --- 1. 좌측 사이드바 (모바일에서는 상단+하단으로 분리됨) --- */}
       <nav className="sidebar">
         <div className="logo">My SNS</div>
         <ul className="menu-list">
-          <li className={activeTab === 'home' ? 'active' : ''} onClick={() => setActiveTab('home')}>🏠 홈</li>
-          <li className={activeTab === 'album' ? 'active' : ''} onClick={() => setActiveTab('album')}>📷 앨범</li>
-          <li className={activeTab === 'diary' ? 'active' : ''} onClick={() => setActiveTab('diary')}>📒 다이어리</li>
-          <li className={activeTab === 'guestbook' ? 'active' : ''} onClick={() => setActiveTab('guestbook')}>📝 방명록</li>
-          <li className={activeTab === 'messenger' ? 'active' : ''} onClick={() => setActiveTab('messenger')}>💬 메신저</li>
+          <li className={activeTab === 'home' ? 'active' : ''} onClick={() => setActiveTab('home')}>
+            🏠 <span className="menu-text">홈</span>
+          </li>
+          <li className={activeTab === 'album' ? 'active' : ''} onClick={() => setActiveTab('album')}>
+            📷 <span className="menu-text">앨범</span>
+          </li>
+          <li className={activeTab === 'diary' ? 'active' : ''} onClick={() => setActiveTab('diary')}>
+            📒 <span className="menu-text">다이어리</span>
+          </li>
+          <li className={activeTab === 'guestbook' ? 'active' : ''} onClick={() => setActiveTab('guestbook')}>
+            📝 <span className="menu-text">방명록</span>
+          </li>
+          <li className={activeTab === 'messenger' ? 'active' : ''} onClick={() => setActiveTab('messenger')}>
+            💬 <span className="menu-text">메신저</span>
+          </li>
         </ul>
       </nav>
-
       {/* 우측 콘텐츠 영역 */}
       <main className="content-area">
         
