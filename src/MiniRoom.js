@@ -1,5 +1,8 @@
 import React, { useState, useRef } from 'react';
 import './MiniRoom.css';
+// 기존 import 아래에 추가
+import { db } from './firebase'; // 방금 만든 설정 파일
+import { collection, addDoc, query, orderBy, onSnapshot, where, serverTimestamp } from 'firebase/firestore';
 
 // ==========================================
 // 1. 📷 앨범 컴포넌트 (사진첩)
@@ -120,52 +123,65 @@ const Guestbook = () => {
 };
 
 // ==========================================
-// 5. 💬 메신저 컴포넌트 (채팅)
+// 5. 💬 메신저 컴포넌트 (파이어베이스 실시간 연동)
 // ==========================================
 const Messenger = () => {
-  // 대화 상대 목록
   const friends = [
-    { id: 1, name: "단짝친구", avatar: "🐱", status: "온라인" },
+    { id: 1, name: "전체 채팅방", avatar: "📢", status: "누구나 환영" }, // 테스트를 위해 1번방을 공용방으로
     { id: 2, name: "김코딩", avatar: "💻", status: "부재중" },
-    { id: 3, name: "댄스강사", avatar: "💃", status: "오프라인" },
   ];
 
-  const [activeChatId, setActiveChatId] = useState(1); // 현재 대화 중인 상대 ID
+  const [activeChatId, setActiveChatId] = useState(1);
   const [inputMsg, setInputMsg] = useState("");
+  const [chatLogs, setChatLogs] = useState([]);
   
-  // 대화 내용 데이터
-  const [chatLogs, setChatLogs] = useState([
-    { roomId: 1, sender: 'them', text: "안녕! 오랜만이야 ㅋㅋ" },
-    { roomId: 1, sender: 'me', text: "오 진짜 오랜만이네!" },
-    { roomId: 2, sender: 'them', text: "과제 다 했어?" },
-  ]);
+  // 내 브라우저 전용 ID 생성 (새로고침 전까지 유지)
+  // 실제로는 로그인한 유저 ID를 써야 하지만, 지금은 임시로 랜덤 ID 사용
+  const [myId] = useState(() => "user_" + Math.random().toString(36).substr(2, 9));
 
-  // 메시지 전송 기능
-  const sendMessage = () => {
+  // --- 1. 실시간 데이터 듣기 (Read) ---
+  React.useEffect(() => {
+    // 'messages'라는 컬렉션에서 -> 현재 방(activeChatId)의 글만 -> 시간순으로 가져오기
+    const q = query(
+      collection(db, "messages"),
+      where("roomId", "==", activeChatId),
+      orderBy("createdAt", "asc")
+    );
+
+    // 실시간 구독 (onSnapshot)
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const newMessages = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setChatLogs(newMessages);
+    });
+
+    return () => unsubscribe(); // 채팅방 나갈 때 구독 취소 (메모리 절약)
+  }, [activeChatId]);
+
+  // --- 2. 메시지 보내기 (Create) ---
+  const sendMessage = async () => {
     if (!inputMsg.trim()) return;
 
-    // 1. 내가 쓴 글 추가
-    const newMsg = { roomId: activeChatId, sender: 'me', text: inputMsg };
-    setChatLogs(prev => [...prev, newMsg]);
-    setInputMsg("");
-
-    // 2. 상대방 자동 답장 (1초 뒤 시뮬레이션)
-    setTimeout(() => {
-      const replyMsg = { 
-        roomId: activeChatId, 
-        sender: 'them', 
-        text: "오, 그렇구나! (자동 응답)" 
-      };
-      setChatLogs(prev => [...prev, replyMsg]);
-    }, 1000);
+    try {
+      await addDoc(collection(db, "messages"), {
+        roomId: activeChatId,
+        text: inputMsg,
+        senderId: myId, // 내가 보냈다는 표시
+        createdAt: serverTimestamp(), // 서버 시간 기준
+      });
+      setInputMsg(""); // 입력창 비우기
+    } catch (error) {
+      console.error("전송 실패:", error);
+    }
   };
 
-  const currentMessages = chatLogs.filter(msg => msg.roomId === activeChatId);
-  const currentFriend = friends.find(f => f.id === activeChatId);
+  const currentFriend = friends.find(f => f.id === activeChatId) || friends[0];
 
   return (
     <div className="tab-content messenger-container">
-      {/* 왼쪽: 친구 목록 */}
+      {/* 친구 목록 */}
       <div className="chat-sidebar">
         <h3>💬 채팅목록</h3>
         <ul>
@@ -185,18 +201,21 @@ const Messenger = () => {
         </ul>
       </div>
 
-      {/* 오른쪽: 채팅창 */}
+      {/* 채팅창 */}
       <div className="chat-room">
         <div className="chat-header">
-          <span>{currentFriend.avatar} <strong>{currentFriend.name}</strong>님과의 대화</span>
+          <span>{currentFriend.avatar} <strong>{currentFriend.name}</strong></span>
         </div>
         
         <div className="chat-messages">
-          {currentMessages.length === 0 ? (
-            <p className="no-msg">대화를 시작해보세요!</p>
+          {chatLogs.length === 0 ? (
+            <p className="no-msg">첫 메시지를 남겨보세요!</p>
           ) : (
-            currentMessages.map((msg, idx) => (
-              <div key={idx} className={`message-bubble ${msg.sender}`}>
+            chatLogs.map((msg) => (
+              <div 
+                key={msg.id} 
+                className={`message-bubble ${msg.senderId === myId ? 'me' : 'them'}`}
+              >
                 {msg.text}
               </div>
             ))
@@ -206,7 +225,7 @@ const Messenger = () => {
         <div className="chat-input-area">
           <input 
             type="text" 
-            placeholder="메시지를 입력하세요..." 
+            placeholder="메시지 입력..." 
             value={inputMsg}
             onChange={(e) => setInputMsg(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
