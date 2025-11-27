@@ -932,3 +932,100 @@
   box-shadow: 0 5px 15px rgba(0,0,0,0.2);
   border-radius: 10px;
 }
+/* --- 컨트롤 패널 리뉴얼 스타일 --- */
+
+.control-actions {
+  display: flex;
+  justify-content: center;
+  gap: 15px; /* 버튼 사이 간격 */
+  align-items: center;
+}
+
+/* 아바타 변경 메인 버튼 */
+.avatar-select-main-btn {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  padding: 8px 15px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.avatar-select-main-btn:hover {
+  background-color: #f9f9f9;
+}
+
+/* 팝업창 위치 잡기 */
+.avatar-control-wrapper {
+  position: relative;
+}
+
+/* 아바타 선택 팝업 */
+.avatar-popup {
+  position: absolute;
+  top: 45px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 320px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+  z-index: 100;
+  overflow: hidden;
+  border: 1px solid #eee;
+}
+
+/* 팝업 내 탭 헤더 */
+.popup-tabs {
+  display: flex;
+  background: #f1f2f6;
+}
+
+.popup-tabs button {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-weight: bold;
+  color: #777;
+  border-bottom: 2px solid transparent;
+}
+
+.popup-tabs button.active {
+  background: white;
+  color: #ff6f61;
+  border-bottom: 2px solid #ff6f61;
+}
+
+/* 팝업 내 내용 영역 */
+.popup-content {
+  padding: 10px;
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 사진 업로드 탭 디자인 */
+.photo-upload-area {
+  text-align: center;
+  color: #666;
+}
+
+.popup-upload-btn {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 8px 16px;
+  background-color: #333;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.popup-upload-btn input {
+  display: none;
+}

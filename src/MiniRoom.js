@@ -174,7 +174,6 @@ const Messenger = () => {
             ...data
           };
         });
-        // 클라이언트 측에서 시간순 정렬
         newMessages.sort((a, b) => {
           const timeA = a.createdAt?.toMillis?.() || a.createdAt?.seconds * 1000 || 0;
           const timeB = b.createdAt?.toMillis?.() || b.createdAt?.seconds * 1000 || 0;
@@ -182,9 +181,7 @@ const Messenger = () => {
         });
         setChatLogs(newMessages);
       },
-      (error) => {
-        console.error("❌ 실시간 메시지 수신 오류:", error);
-      }
+      (error) => console.error("메시지 수신 오류:", error)
     );
 
     return () => unsubscribe();
@@ -275,35 +272,35 @@ const Messenger = () => {
 // 5. 🏠 메인 미니룸 컴포넌트 (통합)
 // ==========================================
 const MiniRoom = () => {
-  // 상태 변수들 (가장 최상위에 위치해야 함!)
+  // 상태 변수들
   const [activeTab, setActiveTab] = useState('home'); 
-  const [wallColor, setWallColor] = useState('#ffe4e1');
+  const [wallColor, setWallColor] = useState('#ffe4e1'); // 기본 배경색 (이미지 없을 때용)
   const [avatar, setAvatar] = useState('🧑‍💻');
   const [bgImage, setBgImage] = useState(null);
   const [isAvatarImage, setIsAvatarImage] = useState(false);
   
-  // 이모티콘 피커 관련 상태 (handleAvatarUpload 밖으로 뺐습니다!)
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  // 아바타 선택 팝업 관련 상태
+  const [showAvatarSelector, setShowAvatarSelector] = useState(false); // 팝업 열기/닫기
+  const [avatarTab, setAvatarTab] = useState('emoji'); // 'emoji' 또는 'photo' 탭
 
-  // 피드 관련 상태
+  // 피드 상태
   const [inputText, setInputText] = useState('');
   const [posts, setPosts] = useState([]);
 
   // --- 기능 함수들 ---
 
-  // 이모티콘 클릭 핸들러
+  // 이모티콘 클릭
   const onEmojiClick = (emojiObject) => {
     setAvatar(emojiObject.emoji); 
     setIsAvatarImage(false);      
-    setShowEmojiPicker(false);    
+    setShowAvatarSelector(false); // 창 닫기    
   };
 
-  // 📷 아바타 사진 업로드 핸들러
+  // 사진 업로드
   const handleAvatarUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    // 리사이징 옵션
     const options = { 
       maxSizeMB: 0.05, 
       maxWidthOrHeight: 200,
@@ -315,12 +312,19 @@ const MiniRoom = () => {
       const url = URL.createObjectURL(compressedFile);
       setAvatar(url);
       setIsAvatarImage(true);
+      setShowAvatarSelector(false); // 창 닫기
     } catch (error) {
       console.error("이미지 줄이기 실패:", error);
     }
   };
 
-  // 피드 데이터 가져오기
+  // 배경 업로드
+  const handleBgUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) setBgImage(URL.createObjectURL(file));
+  };
+
+  // 피드 불러오기
   React.useEffect(() => {
     const q = query(
       collection(db, "feeds"),
@@ -336,7 +340,7 @@ const MiniRoom = () => {
     return () => unsubscribe();
   }, []);
 
-  // 글 작성하기
+  // 글 작성
   const handlePostSubmit = async () => {
     if (inputText.trim() === '') return;
     try {
@@ -364,11 +368,6 @@ const MiniRoom = () => {
       const postRef = doc(db, "feeds", id);
       await deleteDoc(postRef);
     }
-  };
-
-  const handleBgUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) setBgImage(URL.createObjectURL(file));
   };
 
   return (
@@ -410,7 +409,7 @@ const MiniRoom = () => {
               >
                 {!bgImage && <div className="room-floor"></div>}
                 
-                {/* 아바타 표시 영역 (중복 제거됨) */}
+                {/* 아바타 표시 */}
                 <div className="avatar">
                   {isAvatarImage ? (
                     <img src={avatar} alt="my avatar" className="avatar-img" />
@@ -421,46 +420,65 @@ const MiniRoom = () => {
               </div>
             </div>
 
-            {/* 컨트롤 패널 */}
+            {/* --- 컨트롤 패널 (리뉴얼) --- */}
             <div className="controls">
-               <div className="control-row top-row">
-                  <span>벽지: </span>
-                  <button onClick={() => setWallColor('#ffe4e1')}>분홍</button>
-                  <button onClick={() => setWallColor('#e0ffff')}>하늘</button>
-                  <span className="divider">|</span>
-                  
-                  <span>아바타: </span>
-                  <div className="avatar-selector">
-                    <button 
-                      className="emoji-toggle-btn"
-                      onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                    >
-                      😀 고르기
-                    </button>
+              
+              <div className="control-actions">
+                {/* 1. 배경 꾸미기 버튼 (단독) */}
+                <label className="custom-file-btn">
+                  📷 배경 꾸미기
+                  <input type="file" onChange={handleBgUpload} accept="image/*" />
+                </label>
 
-                    <label className="avatar-upload-btn">
-                      ➕ 사진
-                      <input type="file" onChange={handleAvatarUpload} accept="image/*" />
-                    </label>
+                {/* 2. 아바타 선택 버튼 (누르면 팝업) */}
+                <div className="avatar-control-wrapper">
+                  <button 
+                    className="avatar-select-main-btn"
+                    onClick={() => setShowAvatarSelector(!showAvatarSelector)}
+                  >
+                    😊 아바타 변경
+                  </button>
 
-                    {showEmojiPicker && (
-                      <div className="emoji-picker-wrapper">
-                        <EmojiPicker 
-                          onEmojiClick={onEmojiClick} 
-                          width={300} 
-                          height={400}
-                        />
+                  {/* 팝업창 (탭 구조) */}
+                  {showAvatarSelector && (
+                    <div className="avatar-popup">
+                      {/* 탭 헤더 */}
+                      <div className="popup-tabs">
+                        <button 
+                          className={avatarTab === 'emoji' ? 'active' : ''} 
+                          onClick={() => setAvatarTab('emoji')}
+                        >
+                          이모티콘
+                        </button>
+                        <button 
+                          className={avatarTab === 'photo' ? 'active' : ''} 
+                          onClick={() => setAvatarTab('photo')}
+                        >
+                          사진
+                        </button>
                       </div>
-                    )}
-                  </div>
-               </div>
 
-               <div className="control-row bottom-row">
-                 <label className="custom-file-btn">
-                   📷 배경 꾸미기
-                   <input type="file" onChange={handleBgUpload} accept="image/*" />
-                 </label>
-               </div>
+                      {/* 탭 내용 */}
+                      <div className="popup-content">
+                        {avatarTab === 'emoji' && (
+                          <EmojiPicker onEmojiClick={onEmojiClick} width="100%" height={300} />
+                        )}
+                        
+                        {avatarTab === 'photo' && (
+                          <div className="photo-upload-area">
+                            <p>원하는 사진을 올려주세요</p>
+                            <label className="popup-upload-btn">
+                              파일 선택
+                              <input type="file" onChange={handleAvatarUpload} accept="image/*" />
+                            </label>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
             </div>
 
             {/* 뉴스피드 */}
