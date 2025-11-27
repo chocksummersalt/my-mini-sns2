@@ -1,26 +1,15 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import './MiniRoom.css';
-import { db } from './firebase'; 
+import { db, storage } from './firebase'; // storage 추가됨
 import imageCompression from 'browser-image-compression'; 
 import EmojiPicker from 'emoji-picker-react';
-// firebase.js에서 db뿐만 아니라 storage도 가져옵니다.
-import { db, storage } from './firebase'; 
-
-// 파이어베이스 스토리지 함수들 추가
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 import { 
-  collection, 
-  addDoc, 
-  query, 
-  orderBy, 
-  onSnapshot, 
-  serverTimestamp, 
-  updateDoc, 
-  deleteDoc, 
-  doc,
-  where
+  collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, updateDoc, deleteDoc, doc, where
 } from 'firebase/firestore';
+
+// 스토리지 관련 함수 불러오기
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 // ==========================================
 // 1. 📷 앨범 컴포넌트
@@ -37,7 +26,7 @@ const Album = () => {
     if (file) {
       const newPhoto = {
         id: Date.now(),
-        url: URL.createObjectURL(file),
+        url: URL.createObjectURL(file), // 앨범은 일단 로컬 미리보기만 (나중에 스토리지 적용 가능)
         title: "새로운 사진"
       };
       setPhotos([newPhoto, ...photos]);
@@ -163,31 +152,20 @@ const Messenger = () => {
     return newId;
   });
 
-  React.useEffect(() => {
+  useEffect(() => {
     const q = query(
       collection(db, "messages"),
-      where("roomId", "==", activeChatId)
+      where("roomId", "==", activeChatId),
+      orderBy("createdAt", "asc")
     );
 
-    const unsubscribe = onSnapshot(
-      q, 
-      (snapshot) => {
-        const newMessages = snapshot.docs.map(doc => {
-          const data = doc.data();
-          return {
-            id: doc.id,
-            ...data
-          };
-        });
-        newMessages.sort((a, b) => {
-          const timeA = a.createdAt?.toMillis?.() || a.createdAt?.seconds * 1000 || 0;
-          const timeB = b.createdAt?.toMillis?.() || b.createdAt?.seconds * 1000 || 0;
-          return timeA - timeB;
-        });
-        setChatLogs(newMessages);
-      },
-      (error) => console.error("메시지 수신 오류:", error)
-    );
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const newMessages = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setChatLogs(newMessages);
+    });
 
     return () => unsubscribe();
   }, [activeChatId]);
@@ -277,16 +255,30 @@ const Messenger = () => {
 // 5. 🏠 메인 미니룸 컴포넌트 (통합)
 // ==========================================
 const MiniRoom = () => {
-  // 상태 변수들
   const [activeTab, setActiveTab] = useState('home'); 
-  const [wallColor, setWallColor] = useState('#ffe4e1'); // 기본 배경색 (이미지 없을 때용)
-  const [avatar, setAvatar] = useState('🧑‍💻');
+  const [wallColor, setWallColor] = useState('#ffe4e1');
   const [bgImage, setBgImage] = useState(null);
-  const [isAvatarImage, setIsAvatarImage] = useState(false);
   
-  // 아바타 선택 팝업 관련 상태
-  const [showAvatarSelector, setShowAvatarSelector] = useState(false); // 팝업 열기/닫기
-  const [avatarTab, setAvatarTab] = useState('emoji'); // 'emoji' 또는 'photo' 탭
+  // 아바타 & 이모지 상태 (로컬 스토리지 연동: 새로고침 유지)
+  const [avatar, setAvatar] = useState(() => {
+    const saved = localStorage.getItem('my_mini_avatar');
+    return saved || '🧑‍💻';
+  });
+  
+  const [isAvatarImage, setIsAvatarImage] = useState(() => {
+    const saved = localStorage.getItem('my_mini_avatar');
+    // 저장된 값이 http로 시작하면 사진이라고 판단
+    return saved && (saved.startsWith('http') || saved.startsWith('blob:')); 
+  });
+
+  // 상태 변경될 때마다 로컬 스토리지에 저장
+  useEffect(() => {
+    localStorage.setItem('my_mini_avatar', avatar);
+  }, [avatar]);
+  
+  // 팝업 관련 상태
+  const [showAvatarSelector, setShowAvatarSelector] = useState(false);
+  const [avatarTab, setAvatarTab] = useState('emoji');
 
   // 피드 상태
   const [inputText, setInputText] = useState('');
@@ -294,61 +286,60 @@ const MiniRoom = () => {
 
   // --- 기능 함수들 ---
 
-  // 이모티콘 클릭
+  // 1. 이모티콘 클릭
   const onEmojiClick = (emojiObject) => {
     setAvatar(emojiObject.emoji); 
     setIsAvatarImage(false);      
-    setShowAvatarSelector(false); // 창 닫기    
+    setShowAvatarSelector(false);    
   };
 
-  // 사진 업로드
-// 📷 아바타 사진 업로드 및 리사이징 핸들러 (서버 저장 버전)
-const handleAvatarUpload = async (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
+  // 2. 아바타 사진 업로드 (파이어베이스 스토리지로 전송!)
+  const handleAvatarUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
 
-  // 1. 이미지 리사이징 (용량 줄이기)
-  const options = { 
-    maxSizeMB: 0.05, 
-    maxWidthOrHeight: 200,
-    useWebWorker: true
+    // 압축 옵션
+    const options = { 
+      maxSizeMB: 0.1,  // 용량 제한
+      maxWidthOrHeight: 200, // 크기 제한
+      useWebWorker: true
+    };
+
+    try {
+      // 1. 압축하기
+      const compressedFile = await imageCompression(file, options);
+      
+      // 2. 서버(Storage)에 올릴 이름 만들기 (겹치지 않게 시간 추가)
+      const fileName = `avatars/${Date.now()}_${file.name}`;
+      const storageRef = ref(storage, fileName);
+      
+      // 3. 업로드!
+      await uploadBytes(storageRef, compressedFile);
+      
+      // 4. 업로드된 진짜 인터넷 주소 가져오기
+      const downloadURL = await getDownloadURL(storageRef);
+      
+      // 5. 내 아바타로 설정
+      setAvatar(downloadURL);
+      setIsAvatarImage(true);
+      setShowAvatarSelector(false); // 창 닫기
+      
+      console.log("업로드 성공! 주소:", downloadURL);
+
+    } catch (error) {
+      console.error("업로드 실패:", error);
+      alert("사진 업로드 중 문제가 생겼습니다.");
+    }
   };
 
-  try {
-    const compressedFile = await imageCompression(file, options);
-    
-    // 2. 파이어베이스 스토리지에 업로드하기
-    // 파일 이름이 겹치지 않게 날짜 숫자를 붙입니다.
-    const fileName = `avatars/${Date.now()}_${file.name}`;
-    const storageRef = ref(storage, fileName);
-    
-    // 업로드 시작!
-    await uploadBytes(storageRef, compressedFile);
-    
-    // 3. 업로드된 파일의 "인터넷 주소(URL)" 가져오기
-    const downloadURL = await getDownloadURL(storageRef);
-    
-    console.log("서버에 저장된 주소:", downloadURL); // 확인용
-
-    // 4. 상태 업데이트 (이제 blob: 주소가 아니라 https: 주소가 들어갑니다)
-    setAvatar(downloadURL);
-    setIsAvatarImage(true);
-    setShowAvatarSelector(false); // 창 닫기
-
-  } catch (error) {
-    console.error("이미지 업로드 실패:", error);
-    alert("사진 업로드 중 오류가 발생했습니다.");
-  }
-};
-
-  // 배경 업로드
+  // 배경 업로드 (로컬 미리보기만 유지)
   const handleBgUpload = (e) => {
     const file = e.target.files[0];
     if (file) setBgImage(URL.createObjectURL(file));
   };
 
   // 피드 불러오기
-  React.useEffect(() => {
+  useEffect(() => {
     const q = query(
       collection(db, "feeds"),
       orderBy("createdAt", "desc") 
@@ -363,13 +354,13 @@ const handleAvatarUpload = async (e) => {
     return () => unsubscribe();
   }, []);
 
-  // 글 작성
+  // 글 작성 (아바타 URL도 함께 저장됨)
   const handlePostSubmit = async () => {
     if (inputText.trim() === '') return;
     try {
       await addDoc(collection(db, "feeds"), {
         text: inputText,
-        author: avatar,
+        author: avatar, // 여기에 http://... 주소가 들어감!
         createdAt: serverTimestamp(),
         likes: 0,
       });
@@ -432,7 +423,7 @@ const handleAvatarUpload = async (e) => {
               >
                 {!bgImage && <div className="room-floor"></div>}
                 
-                {/* 아바타 표시 */}
+                {/* 미니룸 안의 아바타 */}
                 <div className="avatar">
                   {isAvatarImage ? (
                     <img src={avatar} alt="my avatar" className="avatar-img" />
@@ -443,17 +434,16 @@ const handleAvatarUpload = async (e) => {
               </div>
             </div>
 
-            {/* --- 컨트롤 패널 (리뉴얼) --- */}
+            {/* --- 컨트롤 패널 --- */}
             <div className="controls">
-              
               <div className="control-actions">
-                {/* 1. 배경 꾸미기 버튼 (단독) */}
+                {/* 1. 배경 꾸미기 버튼 */}
                 <label className="custom-file-btn">
                   📷 배경 꾸미기
                   <input type="file" onChange={handleBgUpload} accept="image/*" />
                 </label>
 
-                {/* 2. 아바타 선택 버튼 (누르면 팝업) */}
+                {/* 2. 아바타 변경 버튼 */}
                 <div className="avatar-control-wrapper">
                   <button 
                     className="avatar-select-main-btn"
@@ -462,10 +452,9 @@ const handleAvatarUpload = async (e) => {
                     😊 아바타 변경
                   </button>
 
-                  {/* 팝업창 (탭 구조) */}
+                  {/* 아바타 선택 팝업 */}
                   {showAvatarSelector && (
                     <div className="avatar-popup">
-                      {/* 탭 헤더 */}
                       <div className="popup-tabs">
                         <button 
                           className={avatarTab === 'emoji' ? 'active' : ''} 
@@ -481,7 +470,6 @@ const handleAvatarUpload = async (e) => {
                         </button>
                       </div>
 
-                      {/* 탭 내용 */}
                       <div className="popup-content">
                         {avatarTab === 'emoji' && (
                           <EmojiPicker onEmojiClick={onEmojiClick} width="100%" height={300} />
@@ -492,6 +480,7 @@ const handleAvatarUpload = async (e) => {
                             <p>원하는 사진을 올려주세요</p>
                             <label className="popup-upload-btn">
                               파일 선택
+                              {/* 여기 함수가 바뀐 handleAvatarUpload를 실행합니다 */}
                               <input type="file" onChange={handleAvatarUpload} accept="image/*" />
                             </label>
                           </div>
@@ -501,7 +490,6 @@ const handleAvatarUpload = async (e) => {
                   )}
                 </div>
               </div>
-
             </div>
 
             {/* 뉴스피드 */}
@@ -522,17 +510,14 @@ const handleAvatarUpload = async (e) => {
                 {posts.map(p => (
                   <div key={p.id} className="post-card">
                     <div className="post-header">
-                      
-                      {/* ▼▼▼ 수정한 부분 ▼▼▼ */}
+                      {/* 게시글 아바타 표시 (http 주소면 사진, 아니면 이모지) */}
                       <div className="post-avatar">
-                        {/* p.author가 있고, 주소 형식(blob 또는 http)이라면 이미지 태그 사용 */}
-                        {p.author && (p.author.startsWith('blob:') || p.author.startsWith('http')) ? (
+                        {p.author && (p.author.startsWith('http') || p.author.startsWith('blob:')) ? (
                           <img src={p.author} alt="author" />
                         ) : (
-                          p.author // 아니면 그냥 글자(이모티콘) 출력
+                          p.author 
                         )}
                       </div>
-                      {/* ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲ */}
 
                       <div className="post-info">
                         <span className="post-time">
@@ -543,13 +528,12 @@ const handleAvatarUpload = async (e) => {
                       </div>
                       <button className="delete-btn" onClick={() => handleDelete(p.id)}>🗑️</button>
                     </div>
-
                     <div className="post-content">
                       <p className="post-text">{p.text}</p>
                     </div>
                     <div className="post-actions">
                       <button className="like-btn" onClick={() => handleLike(p.id, p.likes)}>
-                          💖 {p.likes}
+                          ❤️ {p.likes}
                       </button>
                     </div>
                   </div>
