@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import './MiniRoom.css';
 import { db } from './firebase'; 
-import imageCompression from 'browser-image-compression'; // ◀◀◀ 이거 추가
+import imageCompression from 'browser-image-compression'; 
 import EmojiPicker from 'emoji-picker-react';
 
 import { 
@@ -159,7 +159,6 @@ const Messenger = () => {
   });
 
   React.useEffect(() => {
-    // 인덱스 없이도 작동하도록 where만 사용 (orderBy 제거)
     const q = query(
       collection(db, "messages"),
       where("roomId", "==", activeChatId)
@@ -185,16 +184,6 @@ const Messenger = () => {
       },
       (error) => {
         console.error("❌ 실시간 메시지 수신 오류:", error);
-        console.error("에러 코드:", error.code);
-        console.error("에러 메시지:", error.message);
-        
-        if (error.code === 'failed-precondition') {
-          console.error("⚠️ Firestore 인덱스가 필요합니다!");
-          console.error("해결 방법: Firebase 콘솔에서 에러 메시지의 인덱스 생성 링크를 클릭하세요.");
-        } else if (error.code === 'permission-denied') {
-          console.error("⚠️ Firestore 보안 규칙 문제입니다!");
-          console.error("Firebase 콘솔 > Firestore > 규칙에서 읽기 권한을 확인하세요.");
-        }
       }
     );
 
@@ -286,53 +275,52 @@ const Messenger = () => {
 // 5. 🏠 메인 미니룸 컴포넌트 (통합)
 // ==========================================
 const MiniRoom = () => {
+  // 상태 변수들 (가장 최상위에 위치해야 함!)
   const [activeTab, setActiveTab] = useState('home'); 
-  
-  // 미니룸 꾸미기 상태
   const [wallColor, setWallColor] = useState('#ffe4e1');
   const [avatar, setAvatar] = useState('🧑‍💻');
   const [bgImage, setBgImage] = useState(null);
-// --- 아바타 커스텀 상태 ---
-const [isAvatarImage, setIsAvatarImage] = useState(false); // false면 이모티콘, true면 사진
-
-// 📷 아바타 사진 업로드 및 리사이징 핸들러
-const handleAvatarUpload = async (e) => {
-  const file = e.target.files[0];
-
-  // 이모티콘 창을 열고 닫는 상태
+  const [isAvatarImage, setIsAvatarImage] = useState(false);
+  
+  // 이모티콘 피커 관련 상태 (handleAvatarUpload 밖으로 뺐습니다!)
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
-  // 이모티콘 클릭 시 실행될 함수
-  const onEmojiClick = (emojiObject) => {
-    setAvatar(emojiObject.emoji); // 클릭한 이모티콘으로 변경
-    setIsAvatarImage(false);      // "이건 사진이 아니야"라고 알려줌
-    setShowEmojiPicker(false);    // 창 닫기
-  };
-  if (!file) return;
-// ... (기존 코드들) ...
-
-  // 리사이징 옵션 (최대 폭 200px, 용량 0.05MB 이하로 줄임)
-  const options = { 
-    maxSizeMB: 0.05, 
-    maxWidthOrHeight: 200,
-    useWebWorker: true
-  };
-
-  try {
-    const compressedFile = await imageCompression(file, options); // 압축 실행
-    const url = URL.createObjectURL(compressedFile); // 미리보기 URL 생성
-    setAvatar(url);
-    setIsAvatarImage(true); // "이제부터 사진 모드야!"
-  } catch (error) {
-    console.error("이미지 줄이기 실패:", error);
-  }
-};
-
-  // 피드 상태
+  // 피드 관련 상태
   const [inputText, setInputText] = useState('');
   const [posts, setPosts] = useState([]);
 
-  // 1. 피드 데이터 가져오기 (Read)
+  // --- 기능 함수들 ---
+
+  // 이모티콘 클릭 핸들러
+  const onEmojiClick = (emojiObject) => {
+    setAvatar(emojiObject.emoji); 
+    setIsAvatarImage(false);      
+    setShowEmojiPicker(false);    
+  };
+
+  // 📷 아바타 사진 업로드 핸들러
+  const handleAvatarUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // 리사이징 옵션
+    const options = { 
+      maxSizeMB: 0.05, 
+      maxWidthOrHeight: 200,
+      useWebWorker: true
+    };
+
+    try {
+      const compressedFile = await imageCompression(file, options);
+      const url = URL.createObjectURL(compressedFile);
+      setAvatar(url);
+      setIsAvatarImage(true);
+    } catch (error) {
+      console.error("이미지 줄이기 실패:", error);
+    }
+  };
+
+  // 피드 데이터 가져오기
   React.useEffect(() => {
     const q = query(
       collection(db, "feeds"),
@@ -348,7 +336,7 @@ const handleAvatarUpload = async (e) => {
     return () => unsubscribe();
   }, []);
 
-  // 2. 글 작성하기 (Create)
+  // 글 작성하기
   const handlePostSubmit = async () => {
     if (inputText.trim() === '') return;
     try {
@@ -364,13 +352,13 @@ const handleAvatarUpload = async (e) => {
     }
   };
 
-  // 3. 좋아요 (Update)
+  // 좋아요
   const handleLike = async (id, currentLikes) => {
     const postRef = doc(db, "feeds", id);
     await updateDoc(postRef, { likes: currentLikes + 1 });
   };
 
-  // 4. 삭제 (Delete)
+  // 삭제
   const handleDelete = async (id) => {
     if(window.confirm("정말 삭제하시겠습니까?")) {
       const postRef = doc(db, "feeds", id);
@@ -409,8 +397,6 @@ const handleAvatarUpload = async (e) => {
 
       {/* 우측 콘텐츠 영역 */}
       <main className="content-area">
-        
-        {/* 1. 홈 탭 */}
         {activeTab === 'home' && (
           <div className="home-content">
             <div className="room-frame">
@@ -423,21 +409,20 @@ const handleAvatarUpload = async (e) => {
                 }}
               >
                 {!bgImage && <div className="room-floor"></div>}
-                <div className="avatar">{avatar}</div>
-                {/* 기존 코드: <div className="avatar">{avatar}</div> 를 아래로 교체 */}
+                
+                {/* 아바타 표시 영역 (중복 제거됨) */}
                 <div className="avatar">
-                {isAvatarImage ? (
-                <img src={avatar} alt="my avatar" className="avatar-img" />
+                  {isAvatarImage ? (
+                    <img src={avatar} alt="my avatar" className="avatar-img" />
                   ) : (
-                  avatar
-  )}
-</div>
+                    avatar
+                  )}
+                </div>
               </div>
             </div>
 
- {/* 컨트롤 패널 (2단 구성) */}
- <div className="controls">
-               {/* 윗줄: 색상 및 아바타 변경 */}
+            {/* 컨트롤 패널 */}
+            <div className="controls">
                <div className="control-row top-row">
                   <span>벽지: </span>
                   <button onClick={() => setWallColor('#ffe4e1')}>분홍</button>
@@ -446,8 +431,6 @@ const handleAvatarUpload = async (e) => {
                   
                   <span>아바타: </span>
                   <div className="avatar-selector">
-                    
-                    {/* 1. 이모티콘 고르기 버튼 (누르면 피커 열림) */}
                     <button 
                       className="emoji-toggle-btn"
                       onClick={() => setShowEmojiPicker(!showEmojiPicker)}
@@ -455,13 +438,11 @@ const handleAvatarUpload = async (e) => {
                       😀 고르기
                     </button>
 
-                    {/* 2. 사진 업로드 버튼 */}
                     <label className="avatar-upload-btn">
                       ➕ 사진
                       <input type="file" onChange={handleAvatarUpload} accept="image/*" />
                     </label>
 
-                    {/* ▼▼▼ 이모티콘 창 (조건부 렌더링) ▼▼▼ */}
                     {showEmojiPicker && (
                       <div className="emoji-picker-wrapper">
                         <EmojiPicker 
@@ -474,7 +455,6 @@ const handleAvatarUpload = async (e) => {
                   </div>
                </div>
 
-               {/* 아랫줄: 배경 변경 버튼 */}
                <div className="control-row bottom-row">
                  <label className="custom-file-btn">
                    📷 배경 꾸미기
@@ -482,22 +462,20 @@ const handleAvatarUpload = async (e) => {
                  </label>
                </div>
             </div>
-{/* 뉴스피드 (공유 기능) */}
-              <div className="feed-section">
+
+            {/* 뉴스피드 */}
+            <div className="feed-section">
               <h3>📢 뉴스피드 (전체 공유)</h3>
-              
-              {/* ▼▼▼ 여기를 수정했습니다 (textarea로 교체) ▼▼▼ */}
               <div className="input-box">
                 <textarea
                   className="feed-input"
                   value={inputText}
                   onChange={(e) => setInputText(e.target.value)}
                   placeholder="모두와 공유할 이야기를 남겨보세요... (최대 300자)"
-                  maxLength={300} // 300자 제한
+                  maxLength={300}
                 />
                 <button onClick={handlePostSubmit} className="feed-submit-btn">등록</button>
               </div>
-              {/* ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲ */}
 
               <div className="post-list">
                 {posts.map(p => (
@@ -514,13 +492,12 @@ const handleAvatarUpload = async (e) => {
                       <button className="delete-btn" onClick={() => handleDelete(p.id)}>🗑️</button>
                     </div>
                     <div className="post-content">
-                      {/* 긴 글 줄바꿈 허용 */}
                       <p className="post-text">{p.text}</p>
                     </div>
                     <div className="post-actions">
-                    <button className="like-btn" onClick={() => handleLike(p.id, p.likes)}>
-                        💖 {p.likes}
-                    </button>
+                      <button className="like-btn" onClick={() => handleLike(p.id, p.likes)}>
+                          💖 {p.likes}
+                      </button>
                     </div>
                   </div>
                 ))}
@@ -529,7 +506,6 @@ const handleAvatarUpload = async (e) => {
           </div>
         )}
 
-        {/* 다른 탭들 연결 */}
         {activeTab === 'album' && <Album />}
         {activeTab === 'diary' && <Diary />}
         {activeTab === 'guestbook' && <Guestbook />}
