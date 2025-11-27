@@ -245,21 +245,25 @@
   border: 1px solid #eee;
 }
 
-/* 좋아요 버튼 영역 */
+/* --- 좋아요 버튼 영역 스타일 수정 --- */
 .post-actions {
-  margin-top: 10px;
-  border-top: 1px solid #eee;
-  padding-top: 10px;
+  margin-top: 5px;      /* 위쪽 여백 살짝 */
+  border-top: none;     /* ❌ 윗부분 라인 제거 */
+  padding-top: 0;       /* ❌ 패딩 제거 */
   text-align: left;
 }
 
+* 버튼 스타일도 조금 더 깔끔하게 다듬기 */
 .like-btn {
   background: none;
   border: none;
   color: #555;
   font-size: 14px;
   cursor: pointer;
-  padding: 5px;
+  padding: 5px 0;       /* 좌우 패딩 제거해서 왼쪽에 딱 붙게 */
+  display: flex;
+  align-items: center;
+  gap: 5px;             /* 하트와 숫자 사이 간격 */
 }
 
 .like-btn.active {
@@ -268,7 +272,8 @@
 }
 
 .like-btn:hover {
-  background-color: #ffe4e1;
+  background-color: transparent; /* 배경색 변화 없애기 (심플하게) */
+  opacity: 0.7; /* 마우스 올리면 투명도만 살짝 */
 }
 
 /* --- 전체 레이아웃 (가로 배치) --- */

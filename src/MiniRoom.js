@@ -444,9 +444,9 @@ const MiniRoom = () => {
                       <p className="post-text">{p.text}</p>
                     </div>
                     <div className="post-actions">
-                      <button className="like-btn" onClick={() => handleLike(p.id, p.likes)}>
-                        ❤️ 좋아요 {p.likes}
-                      </button>
+                    <button className="like-btn" onClick={() => handleLike(p.id, p.likes)}>
+                        💖 {p.likes}
+                    </button>
                     </div>
                   </div>
                 ))}
