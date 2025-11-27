@@ -918,12 +918,16 @@
 }
 
 /* --- 게시글 본문 스타일 (줄바꿈 처리) --- */
+/* --- 📢 뉴스피드 본문 스타일 (수정됨) --- */
 .post-text {
   margin: 0;
   color: #333;
-  line-height: 1.5; /* 줄 간격 넉넉하게 */
-  white-space: pre-wrap;    /* 엔터(\n)를 화면에 줄바꿈으로 보여주는 속성 */
-  word-break: break-all;
+  line-height: 1.5;
+  
+  /* ▼▼▼ 여기가 수정되었습니다 ▼▼▼ */
+  white-space: pre-wrap;    /* JS가 넣은 엔터(\n)를 화면에 반영함 */
+  word-break: keep-all;     /* 단어를 억지로 끊지 않음 (브라우저 간섭 차단) */
+  overflow-wrap: break-word; /* 혹시라도 박스를 뚫고 나가는 것만 방지 */
   text-align: left;
 }
 /* --- 😀 이모티콘 피커 스타일 --- */
