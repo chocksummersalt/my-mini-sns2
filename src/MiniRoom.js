@@ -156,19 +156,44 @@ const Messenger = () => {
   });
 
   React.useEffect(() => {
+    // 인덱스 없이도 작동하도록 where만 사용 (orderBy 제거)
     const q = query(
       collection(db, "messages"),
-      where("roomId", "==", activeChatId),
-      orderBy("createdAt", "asc") 
+      where("roomId", "==", activeChatId)
     );
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const newMessages = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-      setChatLogs(newMessages);
-    });
+    const unsubscribe = onSnapshot(
+      q, 
+      (snapshot) => {
+        const newMessages = snapshot.docs.map(doc => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            ...data
+          };
+        });
+        // 클라이언트 측에서 시간순 정렬
+        newMessages.sort((a, b) => {
+          const timeA = a.createdAt?.toMillis?.() || a.createdAt?.seconds * 1000 || 0;
+          const timeB = b.createdAt?.toMillis?.() || b.createdAt?.seconds * 1000 || 0;
+          return timeA - timeB;
+        });
+        setChatLogs(newMessages);
+      },
+      (error) => {
+        console.error("❌ 실시간 메시지 수신 오류:", error);
+        console.error("에러 코드:", error.code);
+        console.error("에러 메시지:", error.message);
+        
+        if (error.code === 'failed-precondition') {
+          console.error("⚠️ Firestore 인덱스가 필요합니다!");
+          console.error("해결 방법: Firebase 콘솔에서 에러 메시지의 인덱스 생성 링크를 클릭하세요.");
+        } else if (error.code === 'permission-denied') {
+          console.error("⚠️ Firestore 보안 규칙 문제입니다!");
+          console.error("Firebase 콘솔 > Firestore > 규칙에서 읽기 권한을 확인하세요.");
+        }
+      }
+    );
 
     return () => unsubscribe();
   }, [activeChatId]);
@@ -383,19 +408,23 @@ const MiniRoom = () => {
                </div>
             </div>
 
-            {/* 뉴스피드 (공유 기능) */}
-            <div className="feed-section">
+{/* 뉴스피드 (공유 기능) */}
+              <div className="feed-section">
               <h3>📢 뉴스피드 (전체 공유)</h3>
-              <div className="input-box">
-                <input 
-                  value={inputText} 
-                  onChange={(e) => setInputText(e.target.value)} 
-                  onKeyPress={(e) => e.key === 'Enter' && handlePostSubmit()}
-                  placeholder="모두와 공유할 이야기를 남겨보세요..." 
-                />
-                <button onClick={handlePostSubmit}>등록</button>
-              </div>
               
+              {/* ▼▼▼ 여기를 수정했습니다 (textarea로 교체) ▼▼▼ */}
+              <div className="input-box">
+                <textarea
+                  className="feed-input"
+                  value={inputText}
+                  onChange={(e) => setInputText(e.target.value)}
+                  placeholder="모두와 공유할 이야기를 남겨보세요... (최대 300자)"
+                  maxLength={300} // 300자 제한
+                />
+                <button onClick={handlePostSubmit} className="feed-submit-btn">등록</button>
+              </div>
+              {/* ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲ */}
+
               <div className="post-list">
                 {posts.map(p => (
                   <div key={p.id} className="post-card">
@@ -411,6 +440,7 @@ const MiniRoom = () => {
                       <button className="delete-btn" onClick={() => handleDelete(p.id)}>🗑️</button>
                     </div>
                     <div className="post-content">
+                      {/* 긴 글 줄바꿈 허용 */}
                       <p className="post-text">{p.text}</p>
                     </div>
                     <div className="post-actions">

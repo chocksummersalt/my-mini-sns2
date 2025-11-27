@@ -844,3 +844,57 @@
     justify-content: space-between; /* 양쪽 정렬 */
   }
 }
+
+/* --- 📢 뉴스피드 입력창 확장 스타일 --- */
+
+/* 입력 박스 레이아웃 (세로 배치로 변경할 수도 있지만, 가로 배치 유지하며 높이 키움) */
+.input-box {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  align-items: flex-start; /* 버튼이 위쪽에 붙도록 */
+}
+
+/* 텍스트 영역 (넓고 높게) */
+.feed-input {
+  flex: 1; /* 남은 공간 꽉 채우기 */
+  height: 80px; /* 높이를 넉넉하게 (약 3~4줄) */
+  padding: 12px;
+  border: 2px solid #eee;
+  border-radius: 10px;
+  outline: none;
+  resize: none; /* 사용자 임의 크기 조절 금지 */
+  font-family: inherit; /* 폰트 통일 */
+  font-size: 14px;
+}
+
+.feed-input:focus {
+  border-color: #deb887; /* 포커스 시 색상 */
+}
+
+/* 등록 버튼 */
+.feed-submit-btn {
+  height: 80px; /* 입력창 높이와 맞춤 */
+  width: 70px;
+  background-color: #333;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.feed-submit-btn:hover {
+  background-color: #555;
+}
+
+/* --- 게시글 본문 스타일 (줄바꿈 처리) --- */
+.post-text {
+  margin: 0;
+  color: #333;
+  line-height: 1.5; /* 줄 간격 넉넉하게 */
+  white-space: pre-wrap; /* 엔터(줄바꿈)를 그대로 화면에 보여줌 */
+  word-break: break-all; /* 긴 영단어도 잘라서 줄바꿈 */
+  text-align: left;
+}
