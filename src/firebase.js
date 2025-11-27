@@ -1,16 +1,18 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 
-// 아까 복사한 설정 코드를 여기에 덮어쓰세요!
-// (apiKey, authDomain, projectId 등이 포함된 객체입니다)
+// Firebase 설정
+
+
 const firebaseConfig = {
-  apiKey: "AIzaSyCJy_KNwAia5wXeWfIDYuig7xkbK7x9JWE", 
-  authDomain: "my-mini-sns2.firebaseapp.com",
-  projectId: "my-mini-sns2",
-  storageBucket: "my-mini-sns2.firebasestorage.app",
-  messagingSenderId: "19426165188",
-  appId: "1:19426165188:web:b15ad9f2bc1dec83ffa491",
-  measurementId: "G-31ZCKNXMLJ"
+    apiKey: process.env.REACT_APP_API_KEY,           // <-- 이렇게 바뀜
+    authDomain: process.env.REACT_APP_AUTH_DOMAIN,
+    projectId: process.env.REACT_APP_PROJECT_ID,
+    // ... 나머지도 동일하게 설정
+    storageBucket: process.env.REACT_APP_STORAGE_BUCKET,
+    messagingSenderId: process.env.REACT_APP_MESSAGING_SENDER_ID,
+    appId: process.env.REACT_APP_APP_ID,
+    measurementId: process.env.REACT_APP_MEASUREMENT_ID
 };
 
 // 파이어베이스 초기화
