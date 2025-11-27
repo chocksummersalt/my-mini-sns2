@@ -499,7 +499,18 @@ const MiniRoom = () => {
                 {posts.map(p => (
                   <div key={p.id} className="post-card">
                     <div className="post-header">
-                      <div className="post-avatar">{p.author}</div>
+                      
+                      {/* ▼▼▼ 수정한 부분 ▼▼▼ */}
+                      <div className="post-avatar">
+                        {/* p.author가 있고, 주소 형식(blob 또는 http)이라면 이미지 태그 사용 */}
+                        {p.author && (p.author.startsWith('blob:') || p.author.startsWith('http')) ? (
+                          <img src={p.author} alt="author" />
+                        ) : (
+                          p.author // 아니면 그냥 글자(이모티콘) 출력
+                        )}
+                      </div>
+                      {/* ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲ */}
+
                       <div className="post-info">
                         <span className="post-time">
                           {p.createdAt?.seconds 
@@ -509,6 +520,7 @@ const MiniRoom = () => {
                       </div>
                       <button className="delete-btn" onClick={() => handleDelete(p.id)}>🗑️</button>
                     </div>
+
                     <div className="post-content">
                       <p className="post-text">{p.text}</p>
                     </div>
