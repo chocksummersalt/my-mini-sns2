@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import './MiniRoom.css';
 import { db } from './firebase'; 
 import imageCompression from 'browser-image-compression'; // ◀◀◀ 이거 추가
+import EmojiPicker from 'emoji-picker-react';
 
 import { 
   collection, 
