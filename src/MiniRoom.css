@@ -903,3 +903,32 @@
   word-break: break-all; /* 긴 영단어도 잘라서 줄바꿈 */
   text-align: left;
 }
+/* --- 😀 이모티콘 피커 스타일 --- */
+.emoji-toggle-btn {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.emoji-toggle-btn:hover {
+  background-color: #f0f0f0;
+}
+
+/* 피커가 뜰 위치를 잡기 위해 부모에게 relative 줌 */
+.avatar-selector {
+  position: relative; 
+}
+
+/* 둥둥 떠있는 이모티콘 창 */
+.emoji-picker-wrapper {
+  position: absolute;
+  top: 40px;  /* 버튼 바로 아래 */
+  left: 50%;
+  transform: translateX(-50%); /* 중앙 정렬 */
+  z-index: 100; /* 제일 위에 보이게 */
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  border-radius: 10px;
+}

@@ -1,6 +1,8 @@
 import React, { useState, useRef } from 'react';
 import './MiniRoom.css';
 import { db } from './firebase'; 
+import imageCompression from 'browser-image-compression'; // ◀◀◀ 이거 추가
+
 import { 
   collection, 
   addDoc, 
@@ -289,6 +291,41 @@ const MiniRoom = () => {
   const [wallColor, setWallColor] = useState('#ffe4e1');
   const [avatar, setAvatar] = useState('🧑‍💻');
   const [bgImage, setBgImage] = useState(null);
+// --- 아바타 커스텀 상태 ---
+const [isAvatarImage, setIsAvatarImage] = useState(false); // false면 이모티콘, true면 사진
+
+// 📷 아바타 사진 업로드 및 리사이징 핸들러
+const handleAvatarUpload = async (e) => {
+  const file = e.target.files[0];
+
+  // 이모티콘 창을 열고 닫는 상태
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+
+  // 이모티콘 클릭 시 실행될 함수
+  const onEmojiClick = (emojiObject) => {
+    setAvatar(emojiObject.emoji); // 클릭한 이모티콘으로 변경
+    setIsAvatarImage(false);      // "이건 사진이 아니야"라고 알려줌
+    setShowEmojiPicker(false);    // 창 닫기
+  };
+  if (!file) return;
+// ... (기존 코드들) ...
+
+  // 리사이징 옵션 (최대 폭 200px, 용량 0.05MB 이하로 줄임)
+  const options = { 
+    maxSizeMB: 0.05, 
+    maxWidthOrHeight: 200,
+    useWebWorker: true
+  };
+
+  try {
+    const compressedFile = await imageCompression(file, options); // 압축 실행
+    const url = URL.createObjectURL(compressedFile); // 미리보기 URL 생성
+    setAvatar(url);
+    setIsAvatarImage(true); // "이제부터 사진 모드야!"
+  } catch (error) {
+    console.error("이미지 줄이기 실패:", error);
+  }
+};
 
   // 피드 상태
   const [inputText, setInputText] = useState('');
@@ -386,20 +423,57 @@ const MiniRoom = () => {
               >
                 {!bgImage && <div className="room-floor"></div>}
                 <div className="avatar">{avatar}</div>
+                {/* 기존 코드: <div className="avatar">{avatar}</div> 를 아래로 교체 */}
+                <div className="avatar">
+                {isAvatarImage ? (
+                <img src={avatar} alt="my avatar" className="avatar-img" />
+                  ) : (
+                  avatar
+  )}
+</div>
               </div>
             </div>
 
-            {/* 컨트롤 패널 (2단 구성) */}
-            <div className="controls">
+ {/* 컨트롤 패널 (2단 구성) */}
+ <div className="controls">
+               {/* 윗줄: 색상 및 아바타 변경 */}
                <div className="control-row top-row">
                   <span>벽지: </span>
                   <button onClick={() => setWallColor('#ffe4e1')}>분홍</button>
                   <button onClick={() => setWallColor('#e0ffff')}>하늘</button>
                   <span className="divider">|</span>
+                  
                   <span>아바타: </span>
-                  <button onClick={() => setAvatar('🧑‍💻')}>나</button>
-                  <button onClick={() => setAvatar('🐱')}>냥이</button>
+                  <div className="avatar-selector">
+                    
+                    {/* 1. 이모티콘 고르기 버튼 (누르면 피커 열림) */}
+                    <button 
+                      className="emoji-toggle-btn"
+                      onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                    >
+                      😀 고르기
+                    </button>
+
+                    {/* 2. 사진 업로드 버튼 */}
+                    <label className="avatar-upload-btn">
+                      ➕ 사진
+                      <input type="file" onChange={handleAvatarUpload} accept="image/*" />
+                    </label>
+
+                    {/* ▼▼▼ 이모티콘 창 (조건부 렌더링) ▼▼▼ */}
+                    {showEmojiPicker && (
+                      <div className="emoji-picker-wrapper">
+                        <EmojiPicker 
+                          onEmojiClick={onEmojiClick} 
+                          width={300} 
+                          height={400}
+                        />
+                      </div>
+                    )}
+                  </div>
                </div>
+
+               {/* 아랫줄: 배경 변경 버튼 */}
                <div className="control-row bottom-row">
                  <label className="custom-file-btn">
                    📷 배경 꾸미기
@@ -407,7 +481,6 @@ const MiniRoom = () => {
                  </label>
                </div>
             </div>
-
 {/* 뉴스피드 (공유 기능) */}
               <div className="feed-section">
               <h3>📢 뉴스피드 (전체 공유)</h3>
