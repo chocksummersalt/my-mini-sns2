@@ -292,6 +292,14 @@ const MiniRoom = () => {
     setIsAvatarImage(false);      
     setShowAvatarSelector(false);    
   };
+  // --- [추가] 17글자마다 줄바꿈 해주는 함수 ---
+  const formatText = (text) => {
+    if (!text) return "";
+    // 정규식 설명: 모든 글자(.)를 1개에서 17개까지({1,17}) 묶어서 배열로 만듦
+    const chunks = text.match(/.{1,17}/g); 
+    // 그 묶음들을 줄바꿈 문자(\n)로 연결해서 리턴
+    return chunks ? chunks.join('\n') : text;
+  };
 
   // 2. 아바타 사진 업로드 (파이어베이스 스토리지로 전송!)
   const handleAvatarUpload = async (e) => {
@@ -529,7 +537,7 @@ const MiniRoom = () => {
                       <button className="delete-btn" onClick={() => handleDelete(p.id)}>🗑️</button>
                     </div>
                     <div className="post-content">
-                      <p className="post-text">{p.text}</p>
+                     <p className="post-text">{formatText(p.text)}</p>
                     </div>
                     <div className="post-actions">
                       <button className="like-btn" onClick={() => handleLike(p.id, p.likes)}>

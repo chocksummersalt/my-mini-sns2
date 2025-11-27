@@ -922,8 +922,8 @@
   margin: 0;
   color: #333;
   line-height: 1.5; /* 줄 간격 넉넉하게 */
-  white-space: pre-wrap; /* 엔터(줄바꿈)를 그대로 화면에 보여줌 */
-  word-break: break-all; /* 긴 영단어도 잘라서 줄바꿈 */
+  white-space: pre-wrap;    /* 엔터(\n)를 화면에 줄바꿈으로 보여주는 속성 */
+  word-break: break-all;
   text-align: left;
 }
 /* --- 😀 이모티콘 피커 스타일 --- */
