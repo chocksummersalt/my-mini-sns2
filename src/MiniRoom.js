@@ -16,26 +16,104 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 // ==========================================
 const Album = () => {
   const [photos, setPhotos] = useState([
-    { id: 1, url: "https://via.placeholder.com/150/FFB6C1/000000?text=Trip", title: "여름 휴가" },
-    { id: 2, url: "https://via.placeholder.com/150/87CEEB/000000?text=Food", title: "맛집 탐방" },
-    { id: 3, url: "https://via.placeholder.com/150/F0E68C/000000?text=Cat", title: "우리집 고양이" },
+    { 
+      id: 1, 
+      url: "https://via.placeholder.com/600/FFB6C1/000000?text=Trip", 
+      title: "여름 휴가", 
+      desc: "제주도 바다 정말 예뻤다! 🌊",
+      likes: 12, 
+      comments: [{ id: 1, user: "친구1", text: "우와 부럽다!" }] 
+    },
+    { 
+      id: 2, 
+      url: "https://via.placeholder.com/600/87CEEB/000000?text=Food", 
+      title: "맛집 탐방", 
+      desc: "이 집 파스타 진짜 잘함 🍝",
+      likes: 8, 
+      comments: [] 
+    },
+    { 
+      id: 3, 
+      url: "https://via.placeholder.com/600/F0E68C/000000?text=Cat", 
+      title: "우리집 고양이", 
+      desc: "자는 모습이 천사야 😻",
+      likes: 25, 
+      comments: [{ id: 1, user: "냥집사", text: "츄르길만 걷자" }, { id: 2, user: "지나가던사람", text: "귀여워요ㅠㅠ" }] 
+    },
   ]);
 
+  const [selectedPhoto, setSelectedPhoto] = useState(null); // 현재 클릭해서 보고 있는 사진
+  const [commentInput, setCommentInput] = useState("");     // 댓글 입력창 내용
+
+  // 사진 업로드 (미리보기만 구현)
   const handlePhotoUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
       const newPhoto = {
         id: Date.now(),
-        url: URL.createObjectURL(file), // 앨범은 일단 로컬 미리보기만 (나중에 스토리지 적용 가능)
-        title: "새로운 사진"
+        url: URL.createObjectURL(file),
+        title: "새로운 사진",
+        desc: "새로 올린 사진입니다.",
+        likes: 0,
+        comments: []
       };
       setPhotos([newPhoto, ...photos]);
     }
   };
 
+  // 상세 보기 모달 열기
+  const openModal = (photo) => {
+    setSelectedPhoto(photo);
+    setCommentInput(""); // 입력창 초기화
+  };
+
+  // 모달 닫기
+  const closeModal = () => {
+    setSelectedPhoto(null);
+  };
+
+  // 좋아요 기능 (모달 내부)
+  const handleLike = () => {
+    if (!selectedPhoto) return;
+    
+    // 1. 전체 목록 업데이트
+    const updatedPhotos = photos.map(p => 
+      p.id === selectedPhoto.id ? { ...p, likes: p.likes + 1 } : p
+    );
+    setPhotos(updatedPhotos);
+
+    // 2. 현재 보고 있는 모달 데이터도 업데이트
+    setSelectedPhoto({ ...selectedPhoto, likes: selectedPhoto.likes + 1 });
+  };
+
+  // 댓글 작성 기능
+  const handleAddComment = () => {
+    if (!commentInput.trim() || !selectedPhoto) return;
+
+    const newComment = {
+      id: Date.now(),
+      user: "나", // 로그인 기능이 없으므로 '나'로 고정
+      text: commentInput
+    };
+
+    // 1. 전체 목록 업데이트
+    const updatedPhotos = photos.map(p => 
+      p.id === selectedPhoto.id 
+        ? { ...p, comments: [...p.comments, newComment] } 
+        : p
+    );
+    setPhotos(updatedPhotos);
+
+    // 2. 현재 모달 데이터 업데이트
+    setSelectedPhoto({ 
+      ...selectedPhoto, 
+      comments: [...selectedPhoto.comments, newComment] 
+    });
+    setCommentInput("");
+  };
+
   return (
     <div className="tab-content album-container">
-      {/* ▼▼▼ 수정된 헤더 영역 ▼▼▼ */}
       <div className="album-header">
         <h2>📷 나의 사진첩</h2>
         <label className="upload-btn-box">
@@ -43,21 +121,81 @@ const Album = () => {
           <input type="file" accept="image/*" onChange={handlePhotoUpload} style={{display:'none'}}/>
         </label>
       </div>
-      {/* ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲ */}
 
+      {/* 사진 그리드 */}
       <div className="photo-grid">
         {photos.map(photo => (
-          <div key={photo.id} className="photo-item">
+          <div key={photo.id} className="photo-item" onClick={() => openModal(photo)}>
             <img src={photo.url} alt={photo.title} />
-            {/* 인스타 감성을 위해 사진 제목은 숨깁니다 (CSS에서 처리) */}
-            <p className="photo-title">{photo.title}</p>
+            {/* 마우스 올렸을 때 뜨는 정보 (호버 오버레이) */}
+            <div className="photo-overlay">
+              <span>❤️ {photo.likes}</span>
+              <span>💬 {photo.comments.length}</span>
+            </div>
           </div>
         ))}
       </div>
+
+      {/* ▼▼▼ 상세 보기 모달 (팝업창) ▼▼▼ */}
+      {selectedPhoto && (
+        <div className="modal-overlay" onClick={closeModal}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            
+            {/* 왼쪽: 사진 영역 */}
+            <div className="modal-image-box">
+              <img src={selectedPhoto.url} alt="detail" />
+            </div>
+
+            {/* 오른쪽: 정보 및 댓글 영역 */}
+            <div className="modal-info-box">
+              <div className="modal-header">
+                <span className="modal-user-id">🧑‍💻 user_id</span>
+                <button className="modal-close-btn" onClick={closeModal}>✕</button>
+              </div>
+              
+              <div className="modal-body">
+                {/* 본문 설명 */}
+                <div className="modal-desc">
+                  <strong>user_id</strong> {selectedPhoto.desc}
+                </div>
+                
+                {/* 댓글 리스트 */}
+                <div className="modal-comments">
+                  {selectedPhoto.comments.map(c => (
+                    <div key={c.id} className="comment-row">
+                      <strong>{c.user}</strong> {c.text}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="modal-footer">
+                <div className="modal-actions">
+                  <button onClick={handleLike}>❤️</button>
+                  <button>💬</button>
+                </div>
+                <div className="modal-likes">좋아요 {selectedPhoto.likes}개</div>
+                
+                {/* 댓글 입력창 */}
+                <div className="modal-input-area">
+                  <input 
+                    type="text" 
+                    placeholder="댓글 달기..." 
+                    value={commentInput}
+                    onChange={(e) => setCommentInput(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleAddComment()}
+                  />
+                  <button onClick={handleAddComment}>게시</button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      )}
     </div>
   );
 };
-
 // ==========================================
 // 2. 📒 다이어리 컴포넌트
 // ==========================================

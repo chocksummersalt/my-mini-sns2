@@ -1002,3 +1002,173 @@
     border-bottom: 1px solid #eee;
     padding-bottom: 10px;
   }
+
+  /* =========================================
+   🆕 앨범 상세 모달 & 호버 효과 (인스타 스타일)
+   ========================================= */
+
+/* 1. 그리드 호버 효과 (마우스 올리면 어둡게 + 아이콘) */
+.photo-item .photo-overlay {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.3); /* 반투명 검은색 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+  opacity: 0; /* 평소엔 숨김 */
+  transition: opacity 0.2s;
+  pointer-events: none; /* 클릭은 아래 사진에 전달 */
+}
+
+.photo-item:hover .photo-overlay {
+  opacity: 1; /* 마우스 올리면 보임 */
+}
+
+/* 2. 모달 전체 배경 (검은색 반투명) */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 2000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+/* 3. 모달 하얀 박스 */
+.modal-content {
+  background: white;
+  width: 100%;
+  max-width: 900px;
+  height: 600px; /* 고정 높이 (PC 기준) */
+  display: flex;
+  border-radius: 5px;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+/* 왼쪽 사진 영역 */
+.modal-image-box {
+  flex: 1.5; /* 사진을 더 넓게 */
+  background: black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-image-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* 사진 안 잘리게 */
+}
+
+/* 오른쪽 정보 영역 */
+.modal-info-box {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid #efefef;
+}
+
+/* 헤더 (아이디 + 닫기버튼) */
+.modal-header {
+  padding: 15px;
+  border-bottom: 1px solid #efefef;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+}
+
+.modal-close-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+/* 본문 + 댓글 스크롤 영역 */
+.modal-body {
+  flex: 1; /* 남은 공간 차지 */
+  padding: 15px;
+  overflow-y: auto; /* 댓글 많으면 스크롤 */
+  text-align: left;
+}
+
+.modal-desc {
+  margin-bottom: 15px;
+  line-height: 1.4;
+}
+
+.comment-row {
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+/* 하단 입력창 및 좋아요 */
+.modal-footer {
+  padding: 15px;
+  border-top: 1px solid #efefef;
+  text-align: left;
+}
+
+.modal-actions button {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0;
+  margin-right: 15px;
+}
+
+.modal-likes {
+  font-weight: bold;
+  margin: 5px 0 10px 0;
+  font-size: 14px;
+}
+
+.modal-input-area {
+  display: flex;
+  border-top: 1px solid #efefef;
+  padding-top: 15px;
+}
+
+.modal-input-area input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 14px;
+}
+
+.modal-input-area button {
+  background: none;
+  border: none;
+  color: #0095f6;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* --- 📱 모바일 반응형 (모달) --- */
+@media (max-width: 768px) {
+  .modal-content {
+    flex-direction: column; /* 세로 배치 */
+    height: auto;
+    max-height: 80vh;
+  }
+  
+  .modal-image-box {
+    flex: none;
+    height: 50%;
+  }
+  
+  .modal-info-box {
+    flex: 1;
+    overflow: hidden;
+  }
+}
