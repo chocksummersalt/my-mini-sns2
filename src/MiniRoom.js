@@ -34,17 +34,23 @@ const Album = () => {
   };
 
   return (
-    <div className="tab-content">
-      <h2>📷 나의 사진첩</h2>
-      <label className="upload-btn-box">
-        ➕ 사진 추가하기
-        <input type="file" accept="image/*" onChange={handlePhotoUpload} style={{display:'none'}}/>
-      </label>
+    <div className="tab-content album-container">
+      {/* ▼▼▼ 수정된 헤더 영역 ▼▼▼ */}
+      <div className="album-header">
+        <h2>📷 나의 사진첩</h2>
+        <label className="upload-btn-box">
+          ➕ 사진 추가
+          <input type="file" accept="image/*" onChange={handlePhotoUpload} style={{display:'none'}}/>
+        </label>
+      </div>
+      {/* ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲ */}
+
       <div className="photo-grid">
         {photos.map(photo => (
           <div key={photo.id} className="photo-item">
             <img src={photo.url} alt={photo.title} />
-            <p>{photo.title}</p>
+            {/* 인스타 감성을 위해 사진 제목은 숨깁니다 (CSS에서 처리) */}
+            <p className="photo-title">{photo.title}</p>
           </div>
         ))}
       </div>

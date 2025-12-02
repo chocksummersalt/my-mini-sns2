@@ -408,35 +408,99 @@
   margin-bottom: 20px;
 }
 
-/* 1. 📷 앨범 스타일 (격자무늬) */
+/* =========================================
+   1. 📷 앨범 스타일 (인스타그램 룩 ✨)
+   ========================================= */
+
+/* 앨범 컨텐츠 박스 패딩 줄이기 (사진을 더 크게 보기 위함) */
+.tab-content.album-container {
+  padding: 20px 10px; /* 위아래는 유지, 좌우는 좁게 */
+}
+
+/* 헤더 영역 (제목과 업로드 버튼 가로 배치) */
+.album-header {
+  display: flex;
+  justify-content: space-between; /* 양 끝으로 벌리기 */
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 0 10px; /* 좌우 여백 살짝 */
+}
+
+.album-header h2 {
+  margin: 0;
+  border: none;
+  padding: 0;
+  font-size: 20px;
+}
+
+/* 업로드 버튼 (인스타 스타일 파란 버튼) */
+.upload-btn-box {
+  background-color: #0095f6; /* 인스타그램 블루 */
+  color: white;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.upload-btn-box:hover {
+  background-color: #0074cc; /* 호버 시 진하게 */
+}
+
+/* 그리드 레이아웃 */
 .photo-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr); /* 한 줄에 3개씩 */
-  gap: 15px;
+  grid-template-columns: repeat(3, 1fr); /* 무조건 3단 */
+  gap: 3px; /* 아주 미세한 사이 간격 (인스타 느낌) */
   margin-top: 20px;
 }
 
+/* 개별 사진 아이템 컨테이너 */
 .photo-item {
-  background: #f9f9f9;
-  padding: 10px;
-  border-radius: 10px;
-  text-align: center;
+  position: relative; /* 오버레이 효과를 위해 */
+  aspect-ratio: 1 / 1; /* 🔥 핵심: 가로세로 비율을 무조건 1:1 정사각형으로 고정 */
+  background: #eee; /* 로딩 전 회색 배경 */
+  overflow: hidden;   /* 튀어나가는 이미지 자르기 */
+  padding: 0;         /* 기존 패딩 제거 */
+  border-radius: 0;   /* 기존 둥근 모서리 제거 */
+  cursor: pointer;
 }
 
+/* 이미지 스타일 */
 .photo-item img {
   width: 100%;
-  height: 100px;
-  object-fit: cover;
-  border-radius: 5px;
+  height: 100%;
+  object-fit: cover; /* 비율 유지하며 정사각형 프레임 꽉 채우기 */
+  border-radius: 0;  /* 둥근 모서리 제거 */
+  display: block;    /* 이미지 하단 미세한 여백 제거 */
+  transition: transform 0.2s, opacity 0.2s;
 }
 
-.upload-btn-box {
-  background: #eee;
-  padding: 10px;
-  border-radius: 5px;
-  cursor: pointer;
-  display: inline-block;
-  font-weight: bold;
+/* 마우스 올렸을 때 효과 */
+.photo-item:hover img {
+  opacity: 0.9; /* 살짝 어두워짐 */
+}
+
+/* 사진 제목 숨기기 (인스타는 그리드에서 제목 안 보임) */
+.photo-title {
+  display: none;
+}
+
+/* --- 📱 모바일 미세 조정 --- */
+@media (max-width: 768px) {
+  .tab-content.album-container {
+    padding: 15px 0; /* 모바일에서는 좌우 여백을 아예 없애서 꽉 차게 */
+  }
+  
+  .album-header {
+    padding: 0 15px; /* 헤더만 여백 유지 */
+  }
+  
+  .photo-grid {
+    gap: 1px; /* 모바일은 간격을 더 좁게 */
+  }
 }
 
 /* 2. 📒 다이어리 스타일 */
