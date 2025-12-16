@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './MiniRoom.css';
 import { db, storage } from './firebase'; // storage 추가됨
-import bgwebImage from './assets/bgweb.png';
-import bgmobileImage from './assets/bgmobile.png';
 import imageCompression from 'browser-image-compression'; 
 import EmojiPicker from 'emoji-picker-react';
 
@@ -12,6 +10,10 @@ import {
 
 // 스토리지 관련 함수 불러오기
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+
+// 배경 이미지는 public 폴더에서 직접 참조 (Vercel 빌드 호환성)
+const bgwebImage = '/bgweb.png';
+const bgmobileImage = '/bgmobile.png';
 
 // ==========================================
 // 1. 📷 앨범 컴포넌트
