@@ -1260,3 +1260,11 @@
     background-image: url('./assets/bgmobile.png');
   }
 }
+
+.app-container {
+  /* ... */
+  background-image: url('./assets/bgweb.png');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
