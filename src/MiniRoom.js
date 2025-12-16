@@ -559,18 +559,24 @@ const MiniRoom = () => {
     }
   }, []);
 
+  // 배경 이미지 선택 (안전하게 처리)
   const backgroundImage = isMobile ? bgmobileImage : bgwebImage;
+  
+  // 배경 이미지 스타일 (이미지가 없을 경우를 대비)
+  const backgroundStyle = backgroundImage ? {
+    backgroundImage: `url(${backgroundImage})`,
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    backgroundRepeat: 'no-repeat',
+    backgroundAttachment: 'fixed'
+  } : {
+    backgroundColor: '#f4f4f4' // fallback 배경색
+  };
 
   return (
     <div 
       className="app-container"
-      style={{
-        backgroundImage: `url(${backgroundImage})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-        backgroundAttachment: 'fixed'
-      }}
+      style={backgroundStyle}
     >
       {/* 좌측 사이드바 */}
       <nav className="sidebar">
