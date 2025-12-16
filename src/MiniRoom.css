@@ -292,9 +292,7 @@
 
 /* --- 전체 레이아웃 (가로 배치) --- */
 .app-container {
-  background-image: url('/bgweb.png');
-  background-repeat: no-repeat;
-  background-position: center center; /* 항상 중앙을 보여줌 */
+  /* 배경 이미지는 JavaScript에서 인라인 스타일로 적용 */
   background-size: cover;           /* 화면 꽉 차게 늘림 (비율 유지) */
   background-attachment: fixed;     /* 스크롤해도 배경은 고정됨 (고급짐) */
   display: flex; /* 가로 정렬의 핵심 */
@@ -1166,7 +1164,7 @@
     /* 전체 방향 세로 */
     .app-container { flex-direction: column; }
     .app-container {
-      background-image: url('/bgmobile.png');
+      /* 배경 이미지는 JavaScript에서 인라인 스타일로 적용 */
       background-size: cover;
       background-position: center;
       background-attachment: fixed;

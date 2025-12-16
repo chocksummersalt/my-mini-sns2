@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import './MiniRoom.css';
 import { db, storage } from './firebase'; // storage 추가됨
+import bgwebImage from './assets/bgweb.png';
+import bgmobileImage from './assets/bgmobile.png';
 import imageCompression from 'browser-image-compression'; 
 import EmojiPicker from 'emoji-picker-react';
 
@@ -536,8 +538,20 @@ const MiniRoom = () => {
     }
   };
 
+  // 화면 크기에 따라 배경 이미지 선택
+  const backgroundImage = window.innerWidth <= 768 ? bgmobileImage : bgwebImage;
+
   return (
-    <div className="app-container">
+    <div 
+      className="app-container"
+      style={{
+        backgroundImage: `url(${backgroundImage})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        backgroundAttachment: 'fixed'
+      }}
+    >
       {/* 좌측 사이드바 */}
       <nav className="sidebar">
         <div className="logo">My SNS</div>
