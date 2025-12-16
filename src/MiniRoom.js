@@ -538,8 +538,28 @@ const MiniRoom = () => {
     }
   };
 
-  // 화면 크기에 따라 배경 이미지 선택
-  const backgroundImage = window.innerWidth <= 768 ? bgmobileImage : bgwebImage;
+  // 화면 크기에 따라 배경 이미지 선택 (반응형)
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth <= 768;
+    }
+    return false; // 서버 사이드 렌더링 시 기본값
+  });
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (typeof window !== 'undefined') {
+        setIsMobile(window.innerWidth <= 768);
+      }
+    };
+    
+    if (typeof window !== 'undefined') {
+      window.addEventListener('resize', handleResize);
+      return () => window.removeEventListener('resize', handleResize);
+    }
+  }, []);
+
+  const backgroundImage = isMobile ? bgmobileImage : bgwebImage;
 
   return (
     <div 
