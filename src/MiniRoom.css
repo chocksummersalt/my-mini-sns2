@@ -335,8 +335,50 @@
   font-size: 24px;
   font-weight: bold;
   color: #ff6f61; /* 포인트 컬러 */
-  margin-bottom: 40px;
+  margin-bottom: 20px;
   text-align: center;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.logo:hover {
+  opacity: 0.7;
+}
+
+/* 사용자 정보 영역 */
+.user-info {
+  padding: 15px;
+  margin-bottom: 20px;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.user-avatar-display {
+  font-size: 40px;
+  margin-bottom: 10px;
+}
+
+.user-name {
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.logout-btn, .login-btn {
+  width: 100%;
+  padding: 8px;
+  background-color: #ff6f61;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background-color 0.2s;
+}
+
+.logout-btn:hover, .login-btn:hover {
+  background-color: #ff5240;
 }
 
 .menu-list {

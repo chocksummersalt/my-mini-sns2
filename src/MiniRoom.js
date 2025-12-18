@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import './MiniRoom.css';
-import { db, storage } from './firebase'; // storage 추가됨
+import { useParams, useNavigate } from 'react-router-dom';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { auth, db, storage } from './firebase'; // storage 추가됨
 import imageCompression from 'browser-image-compression'; 
 import EmojiPicker from 'emoji-picker-react';
 
 import { 
-  collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, updateDoc, deleteDoc, doc, where
+  collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, updateDoc, deleteDoc, doc, getDoc, setDoc, where
 } from 'firebase/firestore';
 
 // 스토리지 관련 함수 불러오기
@@ -403,26 +404,21 @@ const Messenger = () => {
 // 5. 🏠 메인 미니룸 컴포넌트 (통합)
 // ==========================================
 const MiniRoom = () => {
+  // URL에서 사용자 이름 가져오기
+  const { username } = useParams();
+  const navigate = useNavigate();
+  const [currentUser, setCurrentUser] = useState(null);
+  const [isOwner, setIsOwner] = useState(false);
+  const [userProfile, setUserProfile] = useState(null);
+  const [userId, setUserId] = useState(null);
+
   const [activeTab, setActiveTab] = useState('home'); 
-  const [wallColor] = useState('#ffe4e1'); // setWallColor는 현재 사용하지 않음
+  const [wallColor, setWallColor] = useState('#ffe4e1');
   const [bgImage, setBgImage] = useState(null);
   
-  // 아바타 & 이모지 상태 (로컬 스토리지 연동: 새로고침 유지)
-  const [avatar, setAvatar] = useState(() => {
-    const saved = localStorage.getItem('my_mini_avatar');
-    return saved || '🧑‍💻';
-  });
-  
-  const [isAvatarImage, setIsAvatarImage] = useState(() => {
-    const saved = localStorage.getItem('my_mini_avatar');
-    // 저장된 값이 http로 시작하면 사진이라고 판단
-    return saved && (saved.startsWith('http') || saved.startsWith('blob:')); 
-  });
-
-  // 상태 변경될 때마다 로컬 스토리지에 저장
-  useEffect(() => {
-    localStorage.setItem('my_mini_avatar', avatar);
-  }, [avatar]);
+  // 아바타 & 이모지 상태 (사용자 프로필에서 가져오기)
+  const [avatar, setAvatar] = useState('🧑‍💻');
+  const [isAvatarImage, setIsAvatarImage] = useState(false);
   
   // 팝업 관련 상태
   const [showAvatarSelector, setShowAvatarSelector] = useState(false);
@@ -432,13 +428,64 @@ const MiniRoom = () => {
   const [inputText, setInputText] = useState('');
   const [posts, setPosts] = useState([]);
 
+  // 사용자 프로필 로드
+  useEffect(() => {
+    const loadUserProfile = async () => {
+      try {
+        // username으로 userId 찾기
+        let targetUserId = username;
+        const usernameDoc = await getDoc(doc(db, 'usernames', username.toLowerCase()));
+        
+        if (usernameDoc.exists()) {
+          targetUserId = usernameDoc.data().userId;
+        }
+        setUserId(targetUserId);
+
+        // 사용자 프로필 가져오기
+        const userDoc = await getDoc(doc(db, 'users', targetUserId));
+        if (userDoc.exists()) {
+          const profile = userDoc.data();
+          setUserProfile(profile);
+          setAvatar(profile.avatar || '🧑‍💻');
+          setIsAvatarImage(profile.avatar && profile.avatar.startsWith('http'));
+          setWallColor(profile.wallColor || '#ffe4e1');
+        }
+
+        // 현재 로그인한 사용자 확인
+        onAuthStateChanged(auth, (user) => {
+          setCurrentUser(user);
+          setIsOwner(user && user.uid === targetUserId);
+        });
+      } catch (error) {
+        console.error('프로필 로드 실패:', error);
+      }
+    };
+
+    if (username) {
+      loadUserProfile();
+    }
+  }, [username]);
+
   // --- 기능 함수들 ---
 
   // 1. 이모티콘 클릭
-  const onEmojiClick = (emojiObject) => {
+  const onEmojiClick = async (emojiObject) => {
+    if (!isOwner) return;
     setAvatar(emojiObject.emoji); 
     setIsAvatarImage(false);      
-    setShowAvatarSelector(false);    
+    setShowAvatarSelector(false);
+    
+    // 프로필 업데이트
+    if (userId && currentUser) {
+      try {
+        await setDoc(doc(db, 'users', userId), {
+          ...userProfile,
+          avatar: emojiObject.emoji
+        }, { merge: true });
+      } catch (error) {
+        console.error('프로필 업데이트 실패:', error);
+      }
+    }
   };
   // --- [추가] 17글자마다 줄바꿈 해주는 함수 ---
   const formatText = (text) => {
@@ -480,6 +527,18 @@ const MiniRoom = () => {
       setIsAvatarImage(true);
       setShowAvatarSelector(false); // 창 닫기
       
+      // 프로필 업데이트
+      if (userId && currentUser) {
+        try {
+          await setDoc(doc(db, 'users', userId), {
+            ...userProfile,
+            avatar: downloadURL
+          }, { merge: true });
+        } catch (error) {
+          console.error('프로필 업데이트 실패:', error);
+        }
+      }
+      
       console.log("업로드 성공! 주소:", downloadURL);
 
     } catch (error) {
@@ -494,10 +553,13 @@ const MiniRoom = () => {
     if (file) setBgImage(URL.createObjectURL(file));
   };
 
-  // 피드 불러오기
+  // 피드 불러오기 (사용자별)
   useEffect(() => {
+    if (!userId) return;
+
     const q = query(
       collection(db, "feeds"),
+      where("userId", "==", userId),
       orderBy("createdAt", "desc") 
     );
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -508,15 +570,22 @@ const MiniRoom = () => {
       setPosts(newPosts);
     });
     return () => unsubscribe();
-  }, []);
+  }, [userId]);
 
-  // 글 작성 (아바타 URL도 함께 저장됨)
+  // 글 작성 (사용자 ID 포함)
   const handlePostSubmit = async () => {
     if (inputText.trim() === '') return;
+    if (!currentUser || !isOwner) {
+      alert('로그인이 필요합니다.');
+      navigate('/login');
+      return;
+    }
     try {
       await addDoc(collection(db, "feeds"), {
         text: inputText,
-        author: avatar, // 여기에 http://... 주소가 들어감!
+        author: avatar,
+        userId: userId,
+        username: username,
         createdAt: serverTimestamp(),
         likes: 0,
       });
@@ -532,11 +601,25 @@ const MiniRoom = () => {
     await updateDoc(postRef, { likes: currentLikes + 1 });
   };
 
-  // 삭제
+  // 삭제 (소유자만 가능)
   const handleDelete = async (id) => {
+    if (!isOwner) {
+      alert('본인의 글만 삭제할 수 있습니다.');
+      return;
+    }
     if(window.confirm("정말 삭제하시겠습니까?")) {
       const postRef = doc(db, "feeds", id);
       await deleteDoc(postRef);
+    }
+  };
+
+  // 로그아웃
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      navigate('/login');
+    } catch (error) {
+      console.error('로그아웃 실패:', error);
     }
   };
 
@@ -582,7 +665,23 @@ const MiniRoom = () => {
     >
       {/* 좌측 사이드바 */}
       <nav className="sidebar">
-        <div className="logo">My SNS</div>
+        <div className="logo" onClick={() => navigate('/')}>My SNS</div>
+        {userProfile && (
+          <div className="user-info">
+            <div className="user-avatar-display">{avatar}</div>
+            <div className="user-name">@{username}</div>
+            {currentUser && (
+              <button className="logout-btn" onClick={handleLogout}>
+                로그아웃
+              </button>
+            )}
+            {!currentUser && (
+              <button className="login-btn" onClick={() => navigate('/login')}>
+                로그인
+              </button>
+            )}
+          </div>
+        )}
         <ul className="menu-list">
           <li className={activeTab === 'home' ? 'active' : ''} onClick={() => setActiveTab('home')}>
             🏠 <span className="menu-text">홈</span>
@@ -689,16 +788,18 @@ const MiniRoom = () => {
             {/* 뉴스피드 */}
             <div className="feed-section">
               <h3>📢 뉴스피드 (전체 공유)</h3>
-              <div className="input-box">
-                <textarea
-                  className="feed-input"
-                  value={inputText}
-                  onChange={(e) => setInputText(e.target.value)}
-                  placeholder="모두와 공유할 이야기를 남겨보세요... (최대 300자)"
-                  maxLength={300}
-                />
-                <button onClick={handlePostSubmit} className="feed-submit-btn">등록</button>
-              </div>
+              {isOwner && (
+                <div className="input-box">
+                  <textarea
+                    className="feed-input"
+                    value={inputText}
+                    onChange={(e) => setInputText(e.target.value)}
+                    placeholder="모두와 공유할 이야기를 남겨보세요... (최대 300자)"
+                    maxLength={300}
+                  />
+                  <button onClick={handlePostSubmit} className="feed-submit-btn">등록</button>
+                </div>
+              )}
 
               <div className="post-list">
                 {posts.map(p => (
@@ -720,7 +821,9 @@ const MiniRoom = () => {
                             : '방금 전'}
                         </span>
                       </div>
-                      <button className="delete-btn" onClick={() => handleDelete(p.id)}>🗑️</button>
+                      {isOwner && (
+                        <button className="delete-btn" onClick={() => handleDelete(p.id)}>🗑️</button>
+                      )}
                     </div>
                     <div className="post-content">
                      <p className="post-text">{formatText(p.text)}</p>
