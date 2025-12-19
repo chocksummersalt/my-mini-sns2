@@ -19,6 +19,7 @@ const Feed = ({ posts, inputText, setInputText, avatar, isOwner, currentUser, us
         username: username,
         createdAt: serverTimestamp(),
         likes: 0,
+        _name_: username || userId, // 인덱스에 맞춰서 _name_ 필드 추가
       });
       setInputText('');
     } catch (error) {

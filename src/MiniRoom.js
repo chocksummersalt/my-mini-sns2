@@ -93,24 +93,48 @@ const MiniRoom = () => {
     }
   }, [username]);
 
-  // 피드 불러오기 (사용자별)
+  // 피드 불러오기 (전체 공유 - 인덱스에 맞춰서)
   useEffect(() => {
-    if (!userId) return;
-
+    // 인덱스 설정에 맞춰서 전체 피드를 createdAt 기준으로 정렬
     const q = query(
       collection(db, "feeds"),
-      where("userId", "==", userId),
       orderBy("createdAt", "desc") 
     );
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const newPosts = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-      setPosts(newPosts);
-    });
+    
+    const unsubscribe = onSnapshot(q, 
+      (snapshot) => {
+        const newPosts = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        setPosts(newPosts);
+      },
+      (error) => {
+        console.error("피드 로드 실패:", error);
+        // 인덱스 오류 시 클라이언트 사이드 정렬로 폴백
+        if (error.code === 'failed-precondition') {
+          console.warn("인덱스가 필요합니다. Firebase Console에서 인덱스를 생성해주세요.");
+          // 인덱스 없이 쿼리 (정렬 없이)
+          const fallbackQuery = query(collection(db, "feeds"));
+          const fallbackUnsubscribe = onSnapshot(fallbackQuery, (snapshot) => {
+            const newPosts = snapshot.docs.map(doc => ({
+              id: doc.id,
+              ...doc.data()
+            }));
+            // 클라이언트 사이드에서 정렬
+            newPosts.sort((a, b) => {
+              const aTime = a.createdAt?.seconds || 0;
+              const bTime = b.createdAt?.seconds || 0;
+              return bTime - aTime; // 내림차순
+            });
+            setPosts(newPosts);
+          });
+          return () => fallbackUnsubscribe();
+        }
+      }
+    );
     return () => unsubscribe();
-  }, [userId]);
+  }, []);
 
   // 배경 업로드 (로컬 미리보기만 유지)
   const handleBgUpload = (e) => {
