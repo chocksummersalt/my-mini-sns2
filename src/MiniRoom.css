@@ -292,34 +292,41 @@
 
 /* --- 전체 레이아웃 (가로 배치) --- */
 .app-container {
-  /* 배경 이미지는 JavaScript에서 인라인 스타일로 적용 */
-  background-size: cover;           /* 화면 꽉 차게 늘림 (비율 유지) */
-  background-attachment: fixed;     /* 스크롤해도 배경은 고정됨 (고급짐) */
-  display: flex; /* 가로 정렬의 핵심 */
+  display: flex;
   min-height: 100vh;
-  background-color: #f4f4f4;
   font-family: 'Arial', sans-serif;
+  
+  /* 배경화면 설정 (전체 꽉 차게) */
+  background-image: url('/bgweb.png'); /* 기본 배경 이미지 */
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed; /* 스크롤해도 배경 고정 */
+  background-color: #f4f4f4; /* fallback 배경색 */
 }
 
 /* --- 1. 좌측 사이드바 (호버 시 나타남) --- */
 .sidebar {
-  width: 200px; /* 고정 너비 */
-  background-color: #fff;
-  padding: 20px;
+  width: 220px;
+  background-color: rgba(255, 255, 255, 0.95); /* 살짝 투명한 흰색 */
+  padding: 30px 20px;
   display: flex;
   flex-direction: column;
-  border-right: 1px solid #eee;
-  position: fixed; /* 스크롤해도 고정되게 */
-  height: 100vh;
+  border-right: 1px solid #ddd;
+  
+  /* 화면 왼쪽에 '딱' 고정 */
+  position: fixed; 
   left: 0;
   top: 0;
-  z-index: 1000;
+  height: 100vh; /* 전체 높이 */
+  z-index: 1000; /* 제일 위에 보이게 */
+  box-shadow: 2px 0 10px rgba(0,0,0,0.1);
   overflow-y: auto;
-  /* 기본적으로 숨김 (왼쪽으로 이동) */
+  
+  /* 기본적으로 숨김 (왼쪽으로 이동) - 데스크톱에서만 */
   transform: translateX(-180px); /* 20px만 보이게 */
   /* 부드러운 애니메이션 */
   transition: transform 0.3s ease-in-out;
-  box-shadow: 2px 0 10px rgba(0,0,0,0.1);
 }
 
 /* 사이드바 자체에 호버 시 완전히 나타남 */
@@ -335,9 +342,11 @@
 .logo {
   font-size: 24px;
   font-weight: bold;
-  color: #ff6f61; /* 포인트 컬러 */
-  margin-bottom: 20px;
+  color: #ff6f61;
+  margin-bottom: 40px;
   text-align: center;
+  border-bottom: 2px solid #ff6f61;
+  padding-bottom: 10px;
   cursor: pointer;
   transition: opacity 0.2s;
 }
@@ -410,14 +419,15 @@
 
 /* --- 2. 우측 콘텐츠 영역 --- */
 .content-area {
-  margin-left: 20px; /* 사이드바가 숨겨져 있을 때 여백 */
+  margin-left: 220px; /* 사이드바 너비만큼 밀기 */
   flex: 1; /* 남은 공간 다 쓰기 */
   padding: 40px;
   display: flex;
   flex-direction: column;
-  align-items: center; /* 내용물 중앙 정렬 */
+  align-items: center; /* 내용물 가운데 정렬 */
+  position: relative;
+  z-index: 1;
   transition: margin-left 0.3s ease-in-out; /* 부드러운 전환 */
-  width: calc(100% - 20px);
   box-sizing: border-box;
   overflow-x: hidden;
   min-height: 100vh;
@@ -426,8 +436,8 @@
 /* 사이드바가 나타날 때 콘텐츠 영역 여백 추가 (데스크톱만) */
 @media (min-width: 769px) {
   .app-container:hover .content-area {
-    margin-left: 200px;
-    width: calc(100% - 200px);
+    margin-left: 220px;
+    width: calc(100% - 220px);
   }
 }
 
