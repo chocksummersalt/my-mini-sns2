@@ -28,7 +28,13 @@ const Sidebar = ({
     <nav className="sidebar">
       <div className="logo" onClick={() => navigate('/')}>My SNS</div>
       <div className="user-info">
-        <div className="user-avatar-display">{avatar}</div>
+        <div className="user-avatar-display">
+          {avatar && (avatar.startsWith('http') || avatar.startsWith('blob:')) ? (
+            <img src={avatar} alt="avatar" className="user-avatar-img" />
+          ) : (
+            avatar
+          )}
+        </div>
         <div className="user-name">@{username}</div>
         {currentUser && (
           <button className="logout-btn" onClick={handleLogout}>
