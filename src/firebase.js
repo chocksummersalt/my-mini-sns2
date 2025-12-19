@@ -16,6 +16,24 @@ const firebaseConfig = {
   measurementId: process.env.REACT_APP_MEASUREMENT_ID
 };
 
+// 환경 변수 확인 및 에러 처리
+if (!firebaseConfig.apiKey || !firebaseConfig.authDomain || !firebaseConfig.projectId) {
+  console.error('❌ Firebase 환경 변수가 설정되지 않았습니다!');
+  console.error('설정된 값:', {
+    apiKey: firebaseConfig.apiKey ? '있음' : '없음',
+    authDomain: firebaseConfig.authDomain ? '있음' : '없음',
+    projectId: firebaseConfig.projectId ? '있음' : '없음'
+  });
+  console.error('Vercel 환경 변수 설정 확인:');
+  console.error('- REACT_APP_API_KEY');
+  console.error('- REACT_APP_AUTH_DOMAIN');
+  console.error('- REACT_APP_PROJECT_ID');
+  console.error('- REACT_APP_STORAGE_BUCKET');
+  console.error('- REACT_APP_MESSAGING_SENDER_ID');
+  console.error('- REACT_APP_APP_ID');
+  console.error('- REACT_APP_MEASUREMENT_ID');
+}
+
 // 파이어베이스 초기화
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app); // 다른 파일에서 쓸 수 있게 내보내기
