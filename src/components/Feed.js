@@ -1,4 +1,5 @@
 import React from 'react';
+import './Feed.css';
 import { collection, addDoc, updateDoc, deleteDoc, doc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../firebase';
 

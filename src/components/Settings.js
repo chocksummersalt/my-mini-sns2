@@ -1,4 +1,5 @@
 import React from 'react';
+import './Settings.css';
 
 const Settings = ({ menuIcons, setMenuIcons, customBgImage, setCustomBgImage, setBgImage }) => {
   return (

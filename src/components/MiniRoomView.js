@@ -1,4 +1,5 @@
 import React from 'react';
+import './MiniRoomView.css';
 import EmojiPicker from 'emoji-picker-react';
 import imageCompression from 'browser-image-compression';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';

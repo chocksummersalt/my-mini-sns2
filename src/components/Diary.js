@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import './Diary.css';
 
 const Diary = () => {
   const [entries, setEntries] = useState([

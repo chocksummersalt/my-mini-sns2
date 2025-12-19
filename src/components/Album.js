@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import './Album.css';
 
 const Album = () => {
   const [photos, setPhotos] = useState([

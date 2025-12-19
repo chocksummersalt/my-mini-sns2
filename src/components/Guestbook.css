@@ -1,0 +1,55 @@
+/* 방명록 입력 영역 */
+.guestbook-input {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.guestbook-input input {
+  padding: 10px;
+  border: 1px solid #eee;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+.guestbook-input input:focus {
+  outline: none;
+  border-color: #ff6f61;
+}
+
+.guestbook-input button {
+  padding: 10px 20px;
+  background-color: #ff6f61;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.guestbook-input button:hover {
+  background-color: #ff5240;
+}
+
+/* 방명록 리스트 */
+.guestbook-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.guestbook-item {
+  border-bottom: 1px dashed #ddd;
+  padding: 10px 0;
+  text-align: left;
+}
+
+.guestbook-item:last-child {
+  border-bottom: none;
+}
+
+.guestbook-item strong {
+  color: #ff6f61;
+  margin-right: 8px;
+}
+
