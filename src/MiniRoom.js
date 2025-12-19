@@ -428,6 +428,16 @@ const MiniRoom = () => {
   const [inputText, setInputText] = useState('');
   const [posts, setPosts] = useState([]);
 
+  // 설정 관련 상태
+  const [menuIcons, setMenuIcons] = useState({
+    home: '🏠',
+    album: '📷',
+    diary: '📒',
+    guestbook: '📝',
+    messenger: '💬'
+  });
+  const [customBgImage, setCustomBgImage] = useState(null);
+
   // 사용자 프로필 로드
   useEffect(() => {
     const loadUserProfile = async () => {
@@ -687,20 +697,25 @@ const MiniRoom = () => {
         )}
         <ul className="menu-list">
           <li className={activeTab === 'home' ? 'active' : ''} onClick={() => setActiveTab('home')}>
-            🏠 <span className="menu-text">홈</span>
+            {menuIcons.home} <span className="menu-text">홈</span>
           </li>
           <li className={activeTab === 'album' ? 'active' : ''} onClick={() => setActiveTab('album')}>
-            📷 <span className="menu-text">앨범</span>
+            {menuIcons.album} <span className="menu-text">앨범</span>
           </li>
           <li className={activeTab === 'diary' ? 'active' : ''} onClick={() => setActiveTab('diary')}>
-            📒 <span className="menu-text">다이어리</span>
+            {menuIcons.diary} <span className="menu-text">다이어리</span>
           </li>
           <li className={activeTab === 'guestbook' ? 'active' : ''} onClick={() => setActiveTab('guestbook')}>
-             📝 <span className="menu-text">방명록</span>
+            {menuIcons.guestbook} <span className="menu-text">방명록</span>
           </li>
           <li className={activeTab === 'messenger' ? 'active' : ''} onClick={() => setActiveTab('messenger')}>
-             💬 <span className="menu-text">메신저</span>
+            {menuIcons.messenger} <span className="menu-text">메신저</span>
           </li>
+          {isOwner && (
+            <li className={activeTab === 'settings' ? 'active' : ''} onClick={() => setActiveTab('settings')}>
+              ⚙️ <span className="menu-text">설정</span>
+            </li>
+          )}
         </ul>
       </nav>
 
@@ -847,6 +862,111 @@ const MiniRoom = () => {
         {activeTab === 'diary' && <Diary />}
         {activeTab === 'guestbook' && <Guestbook />}
         {activeTab === 'messenger' && <Messenger />}
+        
+        {activeTab === 'settings' && isOwner && (
+          <div className="tab-content settings-container">
+            <h2>⚙️ 설정</h2>
+            
+            <div className="settings-section">
+              <h3>배경 이미지</h3>
+              <div className="settings-item">
+                <label>배경 이미지 업로드:</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onload = (event) => {
+                        setCustomBgImage(event.target.result);
+                        setBgImage(event.target.result);
+                      };
+                      reader.readAsDataURL(file);
+                    }
+                  }}
+                />
+                {customBgImage && (
+                  <div className="preview-image">
+                    <img src={customBgImage} alt="배경 미리보기" style={{ maxWidth: '200px', marginTop: '10px' }} />
+                    <button onClick={() => {
+                      setCustomBgImage(null);
+                      setBgImage(null);
+                    }}>제거</button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="settings-section">
+              <h3>메뉴 아이콘 변경</h3>
+              <div className="settings-item">
+                <label>홈 아이콘:</label>
+                <input
+                  type="text"
+                  value={menuIcons.home}
+                  onChange={(e) => setMenuIcons({...menuIcons, home: e.target.value})}
+                  placeholder="이모지 입력"
+                  maxLength={2}
+                />
+              </div>
+              <div className="settings-item">
+                <label>앨범 아이콘:</label>
+                <input
+                  type="text"
+                  value={menuIcons.album}
+                  onChange={(e) => setMenuIcons({...menuIcons, album: e.target.value})}
+                  placeholder="이모지 입력"
+                  maxLength={2}
+                />
+              </div>
+              <div className="settings-item">
+                <label>다이어리 아이콘:</label>
+                <input
+                  type="text"
+                  value={menuIcons.diary}
+                  onChange={(e) => setMenuIcons({...menuIcons, diary: e.target.value})}
+                  placeholder="이모지 입력"
+                  maxLength={2}
+                />
+              </div>
+              <div className="settings-item">
+                <label>방명록 아이콘:</label>
+                <input
+                  type="text"
+                  value={menuIcons.guestbook}
+                  onChange={(e) => setMenuIcons({...menuIcons, guestbook: e.target.value})}
+                  placeholder="이모지 입력"
+                  maxLength={2}
+                />
+              </div>
+              <div className="settings-item">
+                <label>메신저 아이콘:</label>
+                <input
+                  type="text"
+                  value={menuIcons.messenger}
+                  onChange={(e) => setMenuIcons({...menuIcons, messenger: e.target.value})}
+                  placeholder="이모지 입력"
+                  maxLength={2}
+                />
+              </div>
+              <button 
+                onClick={() => {
+                  setMenuIcons({
+                    home: '🏠',
+                    album: '📷',
+                    diary: '📒',
+                    guestbook: '📝',
+                    messenger: '💬'
+                  });
+                }}
+                className="reset-btn"
+              >
+                기본값으로 복원
+              </button>
+            </div>
+          </div>
+        )}
 
       </main>
     </div>

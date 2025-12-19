@@ -310,10 +310,11 @@
   flex-direction: column;
   border-right: 1px solid #eee;
   position: fixed; /* 스크롤해도 고정되게 */
-  height: 100%;
+  height: 100vh;
   left: 0;
   top: 0;
   z-index: 1000;
+  overflow-y: auto;
   /* 기본적으로 숨김 (왼쪽으로 이동) */
   transform: translateX(-180px); /* 20px만 보이게 */
   /* 부드러운 애니메이션 */
@@ -409,21 +410,110 @@
 
 /* --- 2. 우측 콘텐츠 영역 --- */
 .content-area {
-  margin-left: 0; /* 사이드바가 숨겨져 있으므로 여백 제거 */
+  margin-left: 20px; /* 사이드바가 숨겨져 있을 때 여백 */
   flex: 1; /* 남은 공간 다 쓰기 */
   padding: 40px;
   display: flex;
   flex-direction: column;
   align-items: center; /* 내용물 중앙 정렬 */
   transition: margin-left 0.3s ease-in-out; /* 부드러운 전환 */
-  width: 100%;
+  width: calc(100% - 20px);
   box-sizing: border-box;
   overflow-x: hidden;
+  min-height: 100vh;
 }
 
-/* 사이드바가 나타날 때 콘텐츠 영역 여백 추가 */
-.app-container:hover .content-area {
-  margin-left: 200px;
+/* 사이드바가 나타날 때 콘텐츠 영역 여백 추가 (데스크톱만) */
+@media (min-width: 769px) {
+  .app-container:hover .content-area {
+    margin-left: 200px;
+    width: calc(100% - 200px);
+  }
+}
+
+/* 설정 탭 스타일 */
+.settings-container {
+  width: 100%;
+  max-width: 800px;
+  padding: 30px;
+}
+
+.settings-section {
+  margin-bottom: 40px;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+}
+
+.settings-section h3 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #333;
+  font-size: 18px;
+}
+
+.settings-item {
+  margin-bottom: 20px;
+}
+
+.settings-item label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: bold;
+  color: #555;
+}
+
+.settings-item input[type="text"],
+.settings-item input[type="file"] {
+  width: 100%;
+  padding: 10px;
+  border: 2px solid #ddd;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+.settings-item input[type="text"]:focus {
+  outline: none;
+  border-color: #ff6f61;
+}
+
+.preview-image {
+  margin-top: 10px;
+}
+
+.preview-image img {
+  display: block;
+  border-radius: 5px;
+  border: 2px solid #ddd;
+}
+
+.preview-image button {
+  margin-top: 10px;
+  padding: 8px 15px;
+  background-color: #ff6f61;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.preview-image button:hover {
+  background-color: #ff5240;
+}
+
+.reset-btn {
+  padding: 10px 20px;
+  background-color: #666;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+.reset-btn:hover {
+  background-color: #555;
 }
 
 /* 홈 화면 컨텐츠 (기존 스타일 호환) */
