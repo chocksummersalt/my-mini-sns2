@@ -7,7 +7,7 @@
   flex-direction: column;
   border-right: 1px solid #ddd;
   
-  /* 화면 왼쪽에 '딱' 고정 */
+  /* 화면 왼쪽에 고정하되, 배경을 가리지 않도록 */
   position: fixed; 
   left: 0;
   top: 0;
@@ -17,9 +17,27 @@
   overflow-y: auto;
   
   /* 기본적으로 숨김 (왼쪽으로 이동) - 데스크톱에서만 */
-  transform: translateX(-180px); /* 20px만 보이게 */
+  transform: translateX(-200px); /* 완전히 숨김 */
   /* 부드러운 애니메이션 */
   transition: transform 0.3s ease-in-out;
+}
+
+/* 호버 영역 확장 (왼쪽 20px 영역에서도 호버 가능) */
+@media (min-width: 769px) {
+  .app-container::before {
+    content: '';
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 20px;
+    height: 100vh;
+    z-index: 999;
+    background: transparent;
+  }
+  
+  .app-container:hover::before {
+    width: 220px;
+  }
 }
 
 /* 사이드바 자체에 호버 시 완전히 나타남 */
