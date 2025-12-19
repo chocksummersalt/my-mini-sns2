@@ -463,6 +463,9 @@ const MiniRoom = () => {
 
     if (username) {
       loadUserProfile();
+    } else {
+      // username이 없으면 로딩 상태 유지
+      setUserProfile(null);
     }
   }, [username]);
 
