@@ -416,6 +416,9 @@
   flex-direction: column;
   align-items: center; /* 내용물 중앙 정렬 */
   transition: margin-left 0.3s ease-in-out; /* 부드러운 전환 */
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 /* 사이드바가 나타날 때 콘텐츠 영역 여백 추가 */
@@ -782,23 +785,28 @@
 
   /* 1. 사이드바 -> 하단 메뉴바로 변신 */
   .sidebar {
-    width: 100%;       /* 너비 꽉 채우기 */
-    height: 60px;      /* 높이 고정 */
-    position: fixed;   /* 화면에 고정 */
-    bottom: 0;         /* 바닥에 붙이기 */
-    left: 0;
-    top: auto;         /* 위쪽 고정 해제 */
-    flex-direction: row; /* 메뉴 가로로 나열 */
-    padding: 0;
-    border-right: none;
-    border-top: 1px solid #eee;
-    z-index: 1000;     /* 제일 위에 보이게 */
-    box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+    width: 100% !important;       /* 너비 꽉 채우기 */
+    height: 60px !important;      /* 높이 고정 */
+    position: fixed !important;   /* 화면에 고정 */
+    bottom: 0 !important;         /* 바닥에 붙이기 */
+    left: 0 !important;
+    top: auto !important;         /* 위쪽 고정 해제 */
+    flex-direction: row !important; /* 메뉴 가로로 나열 */
+    padding: 0 !important;
+    border-right: none !important;
+    border-top: 1px solid #eee !important;
+    z-index: 1000 !important;     /* 제일 위에 보이게 */
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.05) !important;
     /* 모바일에서는 항상 보이게 */
+    transform: translateX(0) !important;
+    display: flex !important;
+  }
+  
+  /* 모바일에서는 호버 효과 완전히 제거 */
+  .sidebar:hover {
     transform: translateX(0) !important;
   }
   
-  /* 모바일에서는 호버 효과 제거 */
   .app-container:hover .sidebar {
     transform: translateX(0) !important;
   }
@@ -821,6 +829,11 @@
     justify-content: center;
     border-bottom: 1px solid #eee;
     z-index: 1000;
+  }
+  
+  /* 모바일에서 사용자 정보 숨기기 */
+  .user-info {
+    display: none !important;
   }
 
   /* 3. 메뉴 리스트 가로 정렬 */
@@ -852,10 +865,13 @@
 
   /* 5. 콘텐츠 영역 여백 조정 (상단 로고, 하단 메뉴바 피하기) */
   .content-area {
-    margin-left: 0;    /* 사이드바 공간 제거 */
-    margin-top: 50px;  /* 상단 로고 높이만큼 띄우기 */
-    margin-bottom: 60px; /* 하단 메뉴 높이만큼 띄우기 */
-    padding: 20px;
+    margin-left: 0 !important;    /* 사이드바 공간 제거 */
+    margin-top: 50px !important;  /* 상단 로고 높이만큼 띄우기 */
+    margin-bottom: 60px !important; /* 하단 메뉴 높이만큼 띄우기 */
+    padding: 20px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
   }
   
   /* 메신저 높이 조정 */
@@ -1237,12 +1253,18 @@
    ========================================= */
    @media (max-width: 768px) {
     /* 전체 방향 세로 */
-    .app-container { flex-direction: column; }
+    .app-container { 
+      flex-direction: column !important;
+      width: 100% !important;
+      min-height: 100vh !important;
+      overflow-x: hidden !important;
+    }
+    
     .app-container {
       /* 배경 이미지는 JavaScript에서 인라인 스타일로 적용 */
-      background-size: cover;
-      background-position: center;
-      background-attachment: fixed;
+      background-size: cover !important;
+      background-position: center !important;
+      background-attachment: fixed !important;
     }
   
     /* 1. 상단 로고 & 메뉴바 */
@@ -1254,11 +1276,24 @@
     }
   
     .sidebar {
-      width: 100%; height: 60px;
-      position: fixed; bottom: 0; left: 0; top: auto;
-      flex-direction: row; padding: 0;
-      border-right: none; border-top: 1px solid #eee;
-      z-index: 1000; box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+      width: 100% !important; 
+      height: 60px !important;
+      position: fixed !important; 
+      bottom: 0 !important; 
+      left: 0 !important; 
+      top: auto !important;
+      flex-direction: row !important; 
+      padding: 0 !important;
+      border-right: none !important; 
+      border-top: 1px solid #eee !important;
+      z-index: 1000 !important; 
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.05) !important;
+      transform: translateX(0) !important;
+      display: flex !important;
+    }
+    
+    .sidebar:hover {
+      transform: translateX(0) !important;
     }
   
     .menu-list {
@@ -1275,7 +1310,28 @@
   
     /* 2. 콘텐츠 영역 */
     .content-area {
-      margin-left: 0; margin-top: 50px; margin-bottom: 60px; padding: 20px;
+      margin-left: 0 !important; 
+      margin-top: 50px !important; 
+      margin-bottom: 60px !important; 
+      padding: 15px !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      overflow-x: hidden !important;
+      box-sizing: border-box !important;
+      min-height: calc(100vh - 110px) !important;
+    }
+    
+    /* 모바일에서 홈 콘텐츠도 전체 너비 사용 */
+    .home-content {
+      width: 100% !important;
+      max-width: 100% !important;
+    }
+    
+    /* 모바일에서 탭 콘텐츠도 전체 너비 사용 */
+    .tab-content {
+      width: 100% !important;
+      max-width: 100% !important;
+      padding: 20px 15px !important;
     }
   
     /* 3. 미니룸 & 메신저 */
