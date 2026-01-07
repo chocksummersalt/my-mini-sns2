@@ -1,6 +1,9 @@
 /* 앨범 컨텐츠 박스 패딩 줄이기 (사진을 더 크게 보기 위함) */
 .tab-content.album-container {
   padding: 20px 10px; /* 위아래는 유지, 좌우는 좁게 */
+  margin: 0 auto; /* 중앙 정렬 */
+  max-width: calc(100vw - 300px); /* 사이드바(240px) + 여백(60px) 고려 */
+  box-sizing: border-box;
 }
 
 /* 헤더 영역 (제목과 업로드 버튼 가로 배치) */
@@ -19,20 +22,26 @@
   font-size: 20px;
 }
 
-/* 업로드 버튼 (인스타 스타일 파란 버튼) */
+/* 업로드 버튼 - 글래스모피즘 */
 .upload-btn-box {
-  background-color: #0095f6; /* 인스타그램 블루 */
-  color: white;
+  background: linear-gradient(135deg, rgba(0, 149, 246, 0.3) 0%, rgba(0, 116, 204, 0.3) 100%);
+  backdrop-filter: var(--glass-blur-light);
+  -webkit-backdrop-filter: var(--glass-blur-light);
+  border: var(--glass-border);
+  color: rgba(0, 0, 0, 0.85);
   padding: 8px 16px;
-  border-radius: 4px;
+  border-radius: 8px;
   font-weight: bold;
   font-size: 14px;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
+  box-shadow: var(--glass-shadow-sm);
 }
 
 .upload-btn-box:hover {
-  background-color: #0074cc; /* 호버 시 진하게 */
+  background: linear-gradient(135deg, rgba(0, 149, 246, 0.5) 0%, rgba(0, 116, 204, 0.5) 100%);
+  transform: translateY(-1px);
+  box-shadow: var(--glass-shadow-md);
 }
 
 /* 그리드 레이아웃 */
@@ -111,8 +120,12 @@
 }
 
 .modal-content {
-  background: white;
-  border-radius: 15px;
+  background: var(--glass-bg-heavy);
+  backdrop-filter: var(--glass-blur-heavy);
+  -webkit-backdrop-filter: var(--glass-blur-heavy);
+  border: var(--glass-border);
+  box-shadow: var(--glass-shadow-lg);
+  border-radius: 20px;
   max-width: 90%;
   max-height: 90vh;
   overflow: hidden;
@@ -170,17 +183,40 @@
 .comment-input-area input {
   flex: 1;
   padding: 8px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
+  background: var(--glass-bg-light);
+  backdrop-filter: var(--glass-blur-light);
+  -webkit-backdrop-filter: var(--glass-blur-light);
+  border: var(--glass-border);
+  border-radius: 8px;
+  color: rgba(0, 0, 0, 0.87);
+  transition: all 0.3s ease;
+}
+
+.comment-input-area input:focus {
+  outline: none;
+  background: var(--glass-bg-medium);
+  border-color: rgba(168, 218, 220, 0.5);
+  box-shadow: 0 0 0 3px rgba(168, 218, 220, 0.1);
 }
 
 .comment-input-area button {
   padding: 8px 15px;
-  background-color: #0095f6;
-  color: white;
-  border: none;
-  border-radius: 5px;
+  background: linear-gradient(135deg, rgba(0, 149, 246, 0.3) 0%, rgba(0, 116, 204, 0.3) 100%);
+  backdrop-filter: var(--glass-blur-light);
+  -webkit-backdrop-filter: var(--glass-blur-light);
+  border: var(--glass-border);
+  color: rgba(0, 0, 0, 0.85);
+  font-weight: 600;
+  border-radius: 8px;
   cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: var(--glass-shadow-sm);
+}
+
+.comment-input-area button:hover {
+  background: linear-gradient(135deg, rgba(0, 149, 246, 0.5) 0%, rgba(0, 116, 204, 0.5) 100%);
+  transform: translateY(-1px);
+  box-shadow: var(--glass-shadow-md);
 }
 
 /* 모바일 반응형 */

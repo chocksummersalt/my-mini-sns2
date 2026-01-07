@@ -1,40 +1,76 @@
-/* 다이어리 입력 영역 */
+/* 다이어리 입력 영역 - 글래스모피즘 */
 .diary-input {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  margin-bottom: 20px;
-  background: #fff8dc; /* 노란 노트 느낌 */
+  margin: 0 auto 20px auto;
+  max-width: 100%;
+  background: var(--glass-bg-medium);
+  backdrop-filter: var(--glass-blur-medium);
+  -webkit-backdrop-filter: var(--glass-blur-medium);
+  border: var(--glass-border);
+  box-shadow: var(--glass-shadow-lg);
   padding: 15px;
-  border-radius: 10px;
+  border-radius: 16px;
 }
 
 .diary-input input[type="date"] {
   padding: 8px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
+  background: var(--glass-bg-light);
+  backdrop-filter: var(--glass-blur-light);
+  -webkit-backdrop-filter: var(--glass-blur-light);
+  border: var(--glass-border);
+  border-radius: 8px;
+  color: rgba(0, 0, 0, 0.87);
+  transition: all 0.3s ease;
+}
+
+.diary-input input[type="date"]:focus {
+  outline: none;
+  background: var(--glass-bg-medium);
+  border-color: rgba(168, 218, 220, 0.5);
+  box-shadow: 0 0 0 3px rgba(168, 218, 220, 0.1);
 }
 
 .diary-input textarea {
   height: 80px;
   resize: none;
   padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
+  background: var(--glass-bg-light);
+  backdrop-filter: var(--glass-blur-light);
+  -webkit-backdrop-filter: var(--glass-blur-light);
+  border: var(--glass-border);
+  border-radius: 8px;
+  color: rgba(0, 0, 0, 0.87);
+  font-family: inherit;
+  transition: all 0.3s ease;
+}
+
+.diary-input textarea:focus {
+  outline: none;
+  background: var(--glass-bg-medium);
+  border-color: rgba(168, 218, 220, 0.5);
+  box-shadow: 0 0 0 3px rgba(168, 218, 220, 0.1);
 }
 
 .diary-input button {
   padding: 10px 20px;
-  background-color: #ff6f61;
-  color: white;
-  border: none;
-  border-radius: 5px;
+  background: linear-gradient(135deg, rgba(255, 111, 97, 0.3) 0%, rgba(255, 82, 64, 0.3) 100%);
+  backdrop-filter: var(--glass-blur-light);
+  -webkit-backdrop-filter: var(--glass-blur-light);
+  border: var(--glass-border);
+  color: rgba(0, 0, 0, 0.85);
+  border-radius: 8px;
   cursor: pointer;
   font-weight: bold;
+  transition: all 0.2s ease;
+  box-shadow: var(--glass-shadow-sm);
 }
 
 .diary-input button:hover {
-  background-color: #ff5240;
+  background: linear-gradient(135deg, rgba(255, 111, 97, 0.5) 0%, rgba(255, 82, 64, 0.5) 100%);
+  transform: translateY(-1px);
+  box-shadow: var(--glass-shadow-md);
 }
 
 /* 다이어리 카드 리스트 */
@@ -45,12 +81,23 @@
 }
 
 .diary-card {
-  border-left: 4px solid #ff6f61;
-  background: #f9f9f9;
+  border-left: 4px solid rgba(255, 111, 97, 0.7);
+  background: var(--glass-bg-light);
+  backdrop-filter: var(--glass-blur-light);
+  -webkit-backdrop-filter: var(--glass-blur-light);
+  border: var(--glass-border);
+  border-left: 4px solid rgba(255, 111, 97, 0.7);
+  box-shadow: var(--glass-shadow-sm);
   padding: 15px;
   margin-bottom: 10px;
   text-align: left;
-  border-radius: 5px;
+  border-radius: 12px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.diary-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--glass-shadow-md);
 }
 
 .diary-date {

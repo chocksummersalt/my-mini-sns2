@@ -1,12 +1,15 @@
-/* 피드 영역 스타일 */
+/* 피드 영역 스타일 - 글래스모피즘 */
 .feed-section {
   width: 100%;
   max-width: 400px; /* 피드는 너무 넓지 않게 */
   margin: 30px auto 0 auto; /* 가운데 정렬 */
-  background: white;
+  background: var(--glass-bg-medium);
+  backdrop-filter: var(--glass-blur-medium);
+  -webkit-backdrop-filter: var(--glass-blur-medium);
+  border: var(--glass-border);
   padding: 20px;
-  border-radius: 15px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  border-radius: 20px;
+  box-shadow: var(--glass-shadow-lg);
 }
 
 .feed-section h3 {
@@ -51,7 +54,7 @@
   background-color: #555;
 }
 
-/* 게시글 카드 스타일 */
+/* 게시글 카드 스타일 - 글래스모피즘 */
 .post-list {
   display: flex;
   flex-direction: column;
@@ -61,26 +64,38 @@
 .post-card {
   display: flex;
   flex-direction: column;
-  background: #f9f9f9;
+  background: var(--glass-bg-light);
+  backdrop-filter: var(--glass-blur-light);
+  -webkit-backdrop-filter: var(--glass-blur-light);
+  border: var(--glass-border);
   padding: 15px;
-  border-radius: 10px;
+  border-radius: 16px;
+  box-shadow: var(--glass-shadow-sm);
   animation: fadeIn 0.5s ease; /* 글 등록 시 부드럽게 등장 */
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* 아바타 틀 (동그랗고 작은 크기) */
+.post-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--glass-shadow-md);
+}
+
+/* 아바타 틀 (동그랗고 작은 크기) - 글래스모피즘 */
 .post-avatar {
   width: 40px;       /* 고정 너비 (이모티콘과 비슷하게) */
   height: 40px;      /* 고정 높이 */
   border-radius: 50%; /* 완전한 원형 */
   overflow: hidden;   /* 네모난 사진이 튀어나가지 않게 자름 */
   margin-right: 15px;
-  
+
   /* 이모티콘일 때를 위한 중앙 정렬 및 폰트 크기 */
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 28px;   /* 이모티콘 크기 조절 */
-  background-color: #f9f9f9; /* 사진 로딩 전 배경색 */
+  background: var(--glass-bg-light);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
   flex-shrink: 0;
 }
 
@@ -163,13 +178,48 @@
 
 /* 애니메이션 효과 */
 @keyframes fadeIn {
-  from { 
-    opacity: 0; 
-    transform: translateY(-10px); 
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
   }
-  to { 
-    opacity: 1; 
-    transform: translateY(0); 
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 블록 게시물 스타일 */
+.post-content {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* 이미지 블록 */
+.post-image {
+  width: 100%;
+  max-width: 100%;
+  max-height: 600px;
+  border-radius: 8px;
+  object-fit: cover;
+  margin: 5px 0;
+}
+
+/* 영상 블록 */
+.post-video {
+  width: 100%;
+  max-width: 100%;
+  border-radius: 8px;
+  background: #000;
+  aspect-ratio: 16 / 9;
+  object-fit: contain;
+  margin: 5px 0;
+}
+
+/* 모바일 반응형 */
+@media (max-width: 768px) {
+  .post-image {
+    max-height: 400px;
   }
 }
 

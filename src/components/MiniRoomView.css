@@ -1,14 +1,16 @@
-/* 미니룸 외곽 프레임 */
+/* 미니룸 외곽 프레임 - 글래스모피즘 */
 .room-frame {
   width: 300px;
   height: 300px;
-  border: 4px solid #333;
-  border-radius: 10px;
+  border: var(--glass-border);
+  border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+  box-shadow: var(--glass-shadow-lg);
   margin-bottom: 20px;
   position: relative;
-  background-color: white;
+  background: var(--glass-bg-medium);
+  backdrop-filter: var(--glass-blur-medium);
+  -webkit-backdrop-filter: var(--glass-blur-medium);
 }
 
 /* 벽 (배경색이 바뀌는 부분) */
@@ -58,12 +60,15 @@
   border-radius: 50%;
 }
 
-/* 컨트롤 패널 */
+/* 컨트롤 패널 - 글래스모피즘 */
 .controls {
-  background: white;
+  background: var(--glass-bg-medium);
+  backdrop-filter: var(--glass-blur-medium);
+  -webkit-backdrop-filter: var(--glass-blur-medium);
+  border: var(--glass-border);
+  box-shadow: var(--glass-shadow-lg);
   padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  border-radius: 16px;
   text-align: center;
   margin-bottom: 20px;
 }
@@ -77,16 +82,22 @@
 
 .custom-file-btn {
   padding: 10px 20px;
-  background-color: #ff6f61;
-  color: white;
-  border-radius: 5px;
+  background: linear-gradient(135deg, rgba(255, 111, 97, 0.3) 0%, rgba(255, 82, 64, 0.3) 100%);
+  backdrop-filter: var(--glass-blur-light);
+  -webkit-backdrop-filter: var(--glass-blur-light);
+  border: var(--glass-border);
+  color: rgba(0, 0, 0, 0.85);
+  border-radius: 8px;
   cursor: pointer;
   font-weight: bold;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
+  box-shadow: var(--glass-shadow-sm);
 }
 
 .custom-file-btn:hover {
-  background-color: #ff5240;
+  background: linear-gradient(135deg, rgba(255, 111, 97, 0.5) 0%, rgba(255, 82, 64, 0.5) 100%);
+  transform: translateY(-1px);
+  box-shadow: var(--glass-shadow-md);
 }
 
 .custom-file-btn input {
@@ -99,29 +110,37 @@
 
 .avatar-select-main-btn {
   padding: 10px 20px;
-  background-color: #ff6f61;
-  color: white;
-  border: none;
-  border-radius: 5px;
+  background: linear-gradient(135deg, rgba(255, 111, 97, 0.3) 0%, rgba(255, 82, 64, 0.3) 100%);
+  backdrop-filter: var(--glass-blur-light);
+  -webkit-backdrop-filter: var(--glass-blur-light);
+  border: var(--glass-border);
+  color: rgba(0, 0, 0, 0.85);
+  border-radius: 8px;
   cursor: pointer;
   font-weight: bold;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
+  box-shadow: var(--glass-shadow-sm);
 }
 
 .avatar-select-main-btn:hover {
-  background-color: #ff5240;
+  background: linear-gradient(135deg, rgba(255, 111, 97, 0.5) 0%, rgba(255, 82, 64, 0.5) 100%);
+  transform: translateY(-1px);
+  box-shadow: var(--glass-shadow-md);
 }
 
-/* 아바타 선택 팝업 */
+/* 아바타 선택 팝업 - 글래스모피즘 */
 .avatar-popup {
   position: absolute;
   top: 100%;
   left: 50%;
   transform: translateX(-50%);
   margin-top: 10px;
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+  background: var(--glass-bg-heavy);
+  backdrop-filter: var(--glass-blur-heavy);
+  -webkit-backdrop-filter: var(--glass-blur-heavy);
+  border: var(--glass-border);
+  border-radius: 16px;
+  box-shadow: var(--glass-shadow-lg);
   z-index: 1000;
   min-width: 300px;
 }
@@ -143,8 +162,12 @@
 }
 
 .popup-tabs button.active {
-  color: #ff6f61;
-  border-bottom: 2px solid #ff6f61;
+  color: rgba(0, 0, 0, 0.9);
+  font-weight: 700;
+  background: var(--glass-bg-light);
+  backdrop-filter: var(--glass-blur-light);
+  -webkit-backdrop-filter: var(--glass-blur-light);
+  border-bottom: 2px solid rgba(168, 218, 220, 0.7);
 }
 
 .popup-content {
@@ -159,12 +182,17 @@
 .popup-upload-btn {
   display: inline-block;
   padding: 10px 20px;
-  background-color: #ff6f61;
-  color: white;
-  border-radius: 5px;
+  background: linear-gradient(135deg, rgba(255, 111, 97, 0.3) 0%, rgba(255, 82, 64, 0.3) 100%);
+  backdrop-filter: var(--glass-blur-light);
+  -webkit-backdrop-filter: var(--glass-blur-light);
+  border: var(--glass-border);
+  color: rgba(0, 0, 0, 0.85);
+  border-radius: 8px;
   cursor: pointer;
   font-weight: bold;
   margin-top: 10px;
+  transition: all 0.2s ease;
+  box-shadow: var(--glass-shadow-sm);
 }
 
 .popup-upload-btn input {
@@ -172,7 +200,9 @@
 }
 
 .popup-upload-btn:hover {
-  background-color: #ff5240;
+  background: linear-gradient(135deg, rgba(255, 111, 97, 0.5) 0%, rgba(255, 82, 64, 0.5) 100%);
+  transform: translateY(-1px);
+  box-shadow: var(--glass-shadow-md);
 }
 
 /* 홈 콘텐츠 */

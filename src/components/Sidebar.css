@@ -1,43 +1,27 @@
-/* 사이드바 스타일 */
+/* 사이드바 스타일 - 글래스모피즘 */
 .sidebar {
-  width: 220px;
-  background-color: rgba(255, 255, 255, 0.95); /* 살짝 투명한 흰색 */
-  padding: 30px 20px;
+  width: 240px; /* 실제 너비: 220px + 왼쪽 20px hover 영역 */
+  background: var(--glass-bg-medium);
+  backdrop-filter: var(--glass-blur-medium);
+  -webkit-backdrop-filter: var(--glass-blur-medium);
+  padding: 30px 20px 30px 40px; /* 왼쪽 패딩 40px (20px hover 영역 + 20px 실제 패딩) */
   display: flex;
   flex-direction: column;
-  border-right: 1px solid #ddd;
-  
+  border-right: var(--glass-border);
+
   /* 화면 왼쪽에 고정하되, 배경을 가리지 않도록 */
-  position: fixed; 
+  position: fixed;
   left: 0;
   top: 0;
   height: 100vh; /* 전체 높이 */
   z-index: 1000; /* 제일 위에 보이게 */
-  box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+  box-shadow: var(--glass-shadow-md);
   overflow-y: auto;
-  
+
   /* 기본적으로 숨김 (왼쪽으로 이동) - 데스크톱에서만 */
-  transform: translateX(-200px); /* 완전히 숨김 */
+  transform: translateX(-220px); /* 220px만 숨김 (왼쪽 20px는 보임) */
   /* 부드러운 애니메이션 */
   transition: transform 0.3s ease-in-out;
-}
-
-/* 호버 영역 확장 (왼쪽 20px 영역에서도 호버 가능) */
-@media (min-width: 769px) {
-  .app-container::before {
-    content: '';
-    position: fixed;
-    left: 0;
-    top: 0;
-    width: 20px;
-    height: 100vh;
-    z-index: 999;
-    background: transparent;
-  }
-  
-  .app-container:hover::before {
-    width: 220px;
-  }
 }
 
 /* 사이드바 자체에 호버 시 완전히 나타남 */
@@ -45,9 +29,16 @@
   transform: translateX(0);
 }
 
-/* 또는 app-container 왼쪽 영역에 호버 시 나타남 */
-.app-container:hover .sidebar {
-  transform: translateX(0);
+/* 사이드바 hover 시 콘텐츠 영역 이동 */
+@media (min-width: 769px) {
+  .app-container:has(.sidebar:hover) .content-area {
+    margin-left: 240px; /* 사이드바 전체 너비만큼 */
+    width: calc(100% - 240px);
+  }
+  
+  .app-container:has(.sidebar:hover) .tab-content {
+    max-width: calc(100vw - 300px); /* 사이드바(240px) + 여백(60px) */
+  }
 }
 
 .logo {
@@ -66,12 +57,16 @@
   opacity: 0.7;
 }
 
-/* 사용자 정보 영역 */
+/* 사용자 정보 영역 - 글래스모피즘 */
 .user-info {
   padding: 15px;
   margin-bottom: 20px;
-  background-color: #f9f9f9;
-  border-radius: 10px;
+  background: var(--glass-bg-light);
+  backdrop-filter: var(--glass-blur-light);
+  -webkit-backdrop-filter: var(--glass-blur-light);
+  border: var(--glass-border);
+  box-shadow: var(--glass-shadow-sm);
+  border-radius: 12px;
   text-align: center;
 }
 
@@ -99,17 +94,23 @@
 .logout-btn, .login-btn {
   width: 100%;
   padding: 8px;
-  background-color: #ff6f61;
-  color: white;
-  border: none;
-  border-radius: 5px;
+  background: linear-gradient(135deg, rgba(255, 111, 97, 0.3) 0%, rgba(255, 82, 64, 0.3) 100%);
+  backdrop-filter: var(--glass-blur-light);
+  -webkit-backdrop-filter: var(--glass-blur-light);
+  border: var(--glass-border);
+  color: rgba(0, 0, 0, 0.85);
+  font-weight: 600;
+  border-radius: 8px;
   cursor: pointer;
   font-size: 12px;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
+  box-shadow: var(--glass-shadow-sm);
 }
 
 .logout-btn:hover, .login-btn:hover {
-  background-color: #ff5240;
+  background: linear-gradient(135deg, rgba(255, 111, 97, 0.5) 0%, rgba(255, 82, 64, 0.5) 100%);
+  transform: translateY(-1px);
+  box-shadow: var(--glass-shadow-md);
 }
 
 .menu-list {
@@ -133,12 +134,20 @@
 }
 
 .menu-list li:hover {
-  background-color: #ffe4e1;
+  background: var(--glass-bg-light);
+  backdrop-filter: var(--glass-blur-light);
+  -webkit-backdrop-filter: var(--glass-blur-light);
+  box-shadow: var(--glass-shadow-sm);
 }
 
 .menu-list li.active {
-  background-color: #ff6f61;
-  color: white;
+  background: linear-gradient(135deg, rgba(255, 193, 204, 0.4) 0%, rgba(168, 218, 220, 0.4) 100%);
+  backdrop-filter: var(--glass-blur-medium);
+  -webkit-backdrop-filter: var(--glass-blur-medium);
+  border: var(--glass-border);
+  box-shadow: var(--glass-shadow-md);
+  color: rgba(0, 0, 0, 0.9);
+  font-weight: 700;
 }
 
 .menu-text {

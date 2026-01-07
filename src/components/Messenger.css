@@ -6,11 +6,13 @@
   height: 500px; /* 전체 높이 고정 */
 }
 
-/* 왼쪽 사이드바 (친구 목록) */
+/* 왼쪽 사이드바 (친구 목록) - 글래스모피즘 */
 .chat-sidebar {
   width: 150px;
-  background-color: #fcfcfc;
-  border-right: 1px solid #eee;
+  background: var(--glass-bg-light);
+  backdrop-filter: var(--glass-blur-light);
+  -webkit-backdrop-filter: var(--glass-blur-light);
+  border-right: var(--glass-border);
   padding: 15px;
   overflow-y: auto;
 }
@@ -44,11 +46,17 @@
 }
 
 .friend-item:hover {
-  background-color: #f0f0f0;
+  background: var(--glass-bg-light);
+  backdrop-filter: var(--glass-blur-light);
+  -webkit-backdrop-filter: var(--glass-blur-light);
 }
 
 .friend-item.active {
-  background-color: #e0ffff; /* 선택된 친구 강조 */
+  background: var(--glass-bg-medium);
+  backdrop-filter: var(--glass-blur-medium);
+  -webkit-backdrop-filter: var(--glass-blur-medium);
+  border: var(--glass-border);
+  box-shadow: var(--glass-shadow-sm);
 }
 
 .friend-avatar {
@@ -80,12 +88,15 @@
 
 .chat-header {
   padding: 15px;
-  border-bottom: 1px solid #eee;
-  background-color: #fff;
+  border-bottom: var(--glass-border);
+  background: var(--glass-bg-medium);
+  backdrop-filter: var(--glass-blur-medium);
+  -webkit-backdrop-filter: var(--glass-blur-medium);
   font-weight: bold;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  box-shadow: var(--glass-shadow-sm);
 }
 
 .header-title {
@@ -103,11 +114,13 @@
   cursor: pointer;
 }
 
-/* 메시지들이 쌓이는 공간 */
+/* 메시지들이 쌓이는 공간 - 글래스모피즘 */
 .chat-messages {
   flex: 1;
   padding: 20px;
-  background-color: #f1f2f6; /* 카톡 같은 연한 배경 */
+  background: var(--glass-bg-light);
+  backdrop-filter: var(--glass-blur-light);
+  -webkit-backdrop-filter: var(--glass-blur-light);
   overflow-y: auto; /* 내용 넘치면 스크롤 */
   display: flex;
   flex-direction: column;
@@ -125,49 +138,78 @@
   animation: fadeIn 0.2s ease;
 }
 
-/* 상대방 말풍선 (왼쪽, 흰색) */
+/* 상대방 말풍선 (왼쪽) - 글래스모피즘 */
 .message-bubble.them {
   align-self: flex-start;
-  background-color: white;
-  border: 1px solid #ddd;
+  background: var(--glass-bg-medium);
+  backdrop-filter: var(--glass-blur-medium);
+  -webkit-backdrop-filter: var(--glass-blur-medium);
+  border: var(--glass-border);
+  box-shadow: var(--glass-shadow-sm);
   border-top-left-radius: 2px;
 }
 
-/* 내 말풍선 (오른쪽, 노란색) */
+/* 내 말풍선 (오른쪽) - 글래스모피즘 */
 .message-bubble.me {
   align-self: flex-end;
-  background-color: #ffeb33; /* 카톡 노란색 */
+  background: linear-gradient(135deg, rgba(255, 235, 51, 0.4) 0%, rgba(253, 216, 53, 0.4) 100%);
+  backdrop-filter: var(--glass-blur-medium);
+  -webkit-backdrop-filter: var(--glass-blur-medium);
+  border: var(--glass-border);
+  box-shadow: var(--glass-shadow-sm);
   border-top-right-radius: 2px;
 }
 
-/* 입력창 영역 */
+/* 입력창 영역 - 글래스모피즘 */
 .chat-input-area {
   padding: 15px;
-  background-color: white;
-  border-top: 1px solid #eee;
+  background: var(--glass-bg-medium);
+  backdrop-filter: var(--glass-blur-medium);
+  -webkit-backdrop-filter: var(--glass-blur-medium);
+  border-top: var(--glass-border);
+  box-shadow: var(--glass-shadow-sm);
   display: flex;
   gap: 10px;
+  max-width: 100%;
 }
 
 .chat-input-area input {
   flex: 1;
   padding: 10px;
-  border: 1px solid #ddd;
+  background: var(--glass-bg-light);
+  backdrop-filter: var(--glass-blur-light);
+  -webkit-backdrop-filter: var(--glass-blur-light);
+  border: var(--glass-border);
   border-radius: 20px;
+  color: rgba(0, 0, 0, 0.87);
+  transition: all 0.3s ease;
   outline: none;
 }
 
+.chat-input-area input:focus {
+  background: var(--glass-bg-medium);
+  border-color: rgba(168, 218, 220, 0.5);
+  box-shadow: 0 0 0 3px rgba(168, 218, 220, 0.1);
+}
+
 .chat-input-area button {
-  background-color: #ffeb33;
-  border: none;
+  background: linear-gradient(135deg, rgba(255, 235, 51, 0.4) 0%, rgba(253, 216, 53, 0.4) 100%);
+  backdrop-filter: var(--glass-blur-light);
+  -webkit-backdrop-filter: var(--glass-blur-light);
+  border: var(--glass-border);
+  color: rgba(0, 0, 0, 0.85);
   padding: 0 20px;
   border-radius: 20px;
   font-weight: bold;
   cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: var(--glass-shadow-sm);
 }
 
 .chat-input-area button:hover {
-  background-color: #fdd835;
+  background: linear-gradient(135deg, rgba(255, 235, 51, 0.6) 0%, rgba(253, 216, 53, 0.6) 100%);
+  transform: translateY(-1px);
+  box-shadow: var(--glass-shadow-md);
 }
 
 .no-msg {

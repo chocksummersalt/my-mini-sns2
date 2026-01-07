@@ -1,0 +1,282 @@
+/* AI 이미지 생성 컨테이너 - 글래스모피즘 */
+.ai-generator-container {
+  width: 100%;
+  max-width: calc(100vw - 300px); /* 사이드바(240px) + 여백(60px) 고려 */
+  padding: 30px;
+  margin: 0 auto; /* 중앙 정렬 */
+  box-sizing: border-box;
+}
+
+.ai-generator-container h2 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  color: rgba(0, 0, 0, 0.85);
+}
+
+.ai-description {
+  color: rgba(0, 0, 0, 0.65);
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+/* 생성 횟수 표시 */
+.generation-info {
+  margin-bottom: 20px;
+  text-align: right;
+}
+
+.generation-count {
+  display: inline-block;
+  padding: 6px 12px;
+  background: var(--glass-bg-light);
+  backdrop-filter: var(--glass-blur-light);
+  -webkit-backdrop-filter: var(--glass-blur-light);
+  border: var(--glass-border);
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.7);
+}
+
+/* 프롬프트 입력 영역 */
+.prompt-input-area {
+  background: var(--glass-bg-medium);
+  backdrop-filter: var(--glass-blur-medium);
+  -webkit-backdrop-filter: var(--glass-blur-medium);
+  border: var(--glass-border);
+  box-shadow: var(--glass-shadow-lg);
+  padding: 20px;
+  border-radius: 16px;
+  margin: 0 auto 20px auto;
+  max-width: 100%;
+}
+
+.prompt-textarea {
+  width: 100%;
+  padding: 15px;
+  background: var(--glass-bg-light);
+  backdrop-filter: var(--glass-blur-light);
+  -webkit-backdrop-filter: var(--glass-blur-light);
+  border: var(--glass-border);
+  border-radius: 12px;
+  font-size: 15px;
+  font-family: inherit;
+  resize: vertical;
+  outline: none;
+  transition: all 0.3s ease;
+  color: rgba(0, 0, 0, 0.87);
+  margin-bottom: 15px;
+}
+
+.prompt-textarea::placeholder {
+  color: rgba(0, 0, 0, 0.4);
+}
+
+.prompt-textarea:focus {
+  background: var(--glass-bg-medium);
+  border-color: rgba(168, 218, 220, 0.5);
+  box-shadow: 0 0 0 3px rgba(168, 218, 220, 0.1);
+}
+
+.prompt-textarea:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* 생성 버튼 */
+.generate-btn {
+  width: 100%;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, rgba(255,193,204,0.4) 0%, rgba(168,218,220,0.4) 100%);
+  backdrop-filter: var(--glass-blur-medium);
+  -webkit-backdrop-filter: var(--glass-blur-medium);
+  border: var(--glass-border);
+  border-radius: 12px;
+  color: rgba(0, 0, 0, 0.87);
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: var(--glass-shadow-md);
+}
+
+.generate-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, rgba(255,193,204,0.6) 0%, rgba(168,218,220,0.6) 100%);
+  transform: translateY(-2px);
+  box-shadow: var(--glass-shadow-lg);
+}
+
+.generate-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* 에러 메시지 */
+.error-message {
+  padding: 15px;
+  background: linear-gradient(135deg, rgba(244, 67, 54, 0.2) 0%, rgba(211, 47, 47, 0.2) 100%);
+  backdrop-filter: var(--glass-blur-light);
+  -webkit-backdrop-filter: var(--glass-blur-light);
+  border: 1px solid rgba(244, 67, 54, 0.3);
+  border-radius: 12px;
+  color: rgba(0, 0, 0, 0.85);
+  margin-bottom: 20px;
+  font-weight: 500;
+}
+
+/* 생성된 이미지 섹션 */
+.generated-image-section {
+  background: var(--glass-bg-medium);
+  backdrop-filter: var(--glass-blur-medium);
+  -webkit-backdrop-filter: var(--glass-blur-medium);
+  border: var(--glass-border);
+  box-shadow: var(--glass-shadow-lg);
+  padding: 20px;
+  border-radius: 16px;
+  margin-bottom: 20px;
+  animation: fadeIn 0.3s ease;
+}
+
+.generated-image-section h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: rgba(0, 0, 0, 0.85);
+}
+
+/* 이미지 미리보기 */
+.image-preview {
+  width: 100%;
+  max-width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 15px;
+  background: var(--glass-bg-light);
+  border: var(--glass-border);
+  box-shadow: var(--glass-shadow-md);
+}
+
+.image-preview img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 12px;
+}
+
+/* 액션 버튼들 */
+.action-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.apply-bg-btn,
+.download-btn {
+  flex: 1;
+  padding: 12px 20px;
+  border: var(--glass-border);
+  border-radius: 12px;
+  font-weight: bold;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: var(--glass-shadow-sm);
+}
+
+.apply-bg-btn {
+  background: linear-gradient(135deg, rgba(76, 175, 80, 0.3) 0%, rgba(56, 142, 60, 0.3) 100%);
+  backdrop-filter: var(--glass-blur-light);
+  -webkit-backdrop-filter: var(--glass-blur-light);
+  color: rgba(0, 0, 0, 0.85);
+}
+
+.apply-bg-btn:hover {
+  background: linear-gradient(135deg, rgba(76, 175, 80, 0.5) 0%, rgba(56, 142, 60, 0.5) 100%);
+  transform: translateY(-1px);
+  box-shadow: var(--glass-shadow-md);
+}
+
+.download-btn {
+  background: linear-gradient(135deg, rgba(33, 150, 243, 0.3) 0%, rgba(25, 118, 210, 0.3) 100%);
+  backdrop-filter: var(--glass-blur-light);
+  -webkit-backdrop-filter: var(--glass-blur-light);
+  color: rgba(0, 0, 0, 0.85);
+}
+
+.download-btn:hover {
+  background: linear-gradient(135deg, rgba(33, 150, 243, 0.5) 0%, rgba(25, 118, 210, 0.5) 100%);
+  transform: translateY(-1px);
+  box-shadow: var(--glass-shadow-md);
+}
+
+/* 사용 팁 */
+.usage-tips {
+  background: var(--glass-bg-light);
+  backdrop-filter: var(--glass-blur-light);
+  -webkit-backdrop-filter: var(--glass-blur-light);
+  border: var(--glass-border);
+  box-shadow: var(--glass-shadow-sm);
+  padding: 20px;
+  border-radius: 16px;
+}
+
+.usage-tips h4 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  color: rgba(0, 0, 0, 0.85);
+}
+
+.usage-tips ul {
+  margin: 0;
+  padding-left: 20px;
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.usage-tips li {
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+
+/* 애니메이션 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 모바일 반응형 */
+@media (max-width: 768px) {
+  .ai-generator-container {
+    padding: 20px 15px;
+  }
+
+  .prompt-input-area {
+    padding: 15px;
+  }
+
+  .prompt-textarea {
+    font-size: 16px; /* iOS 자동 줌 방지 */
+    padding: 12px;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+  }
+
+  .apply-bg-btn,
+  .download-btn {
+    width: 100%;
+  }
+
+  .usage-tips {
+    padding: 15px;
+  }
+
+  .usage-tips li {
+    font-size: 14px;
+  }
+}

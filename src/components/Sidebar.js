@@ -63,6 +63,9 @@ const Sidebar = ({
         <li className={activeTab === 'messenger' ? 'active' : ''} onClick={() => setActiveTab('messenger')}>
           {menuIcons.messenger} <span className="menu-text">메신저</span>
         </li>
+        <li className={activeTab === 'ai' ? 'active' : ''} onClick={() => setActiveTab('ai')}>
+          {menuIcons.ai || '🤖'} <span className="menu-text">AI 이미지</span>
+        </li>
         {isOwner && (
           <li className={activeTab === 'settings' ? 'active' : ''} onClick={() => setActiveTab('settings')}>
             ⚙️ <span className="menu-text">설정</span>

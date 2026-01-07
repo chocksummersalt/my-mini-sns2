@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth, db } from './firebase';
-import { doc, getDoc, query, collection, where, orderBy, onSnapshot } from 'firebase/firestore';
+import { doc, getDoc, query, collection, orderBy, onSnapshot } from 'firebase/firestore';
 
 // 컴포넌트 import
 import Sidebar from './components/Sidebar';
@@ -13,6 +13,7 @@ import Diary from './components/Diary';
 import Guestbook from './components/Guestbook';
 import Messenger from './components/Messenger';
 import Settings from './components/Settings';
+import AIImageGenerator from './components/AIImageGenerator';
 
 // 배경 이미지는 public 폴더에서 직접 참조 (Vercel 빌드 호환성)
 const bgwebImage = '/bgweb.png';
@@ -49,7 +50,8 @@ const MiniRoom = () => {
     album: '📷',
     diary: '📒',
     guestbook: '📝',
-    messenger: '💬'
+    messenger: '💬',
+    ai: '🤖'
   });
   const [customBgImage, setCustomBgImage] = useState(null);
 
@@ -248,7 +250,8 @@ const MiniRoom = () => {
         {activeTab === 'diary' && <Diary />}
         {activeTab === 'guestbook' && <Guestbook />}
         {activeTab === 'messenger' && <Messenger />}
-        
+        {activeTab === 'ai' && <AIImageGenerator setBgImage={setBgImage} />}
+
         {activeTab === 'settings' && isOwner && (
           <Settings
             menuIcons={menuIcons}

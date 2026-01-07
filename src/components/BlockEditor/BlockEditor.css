@@ -1,0 +1,261 @@
+/* BlockEditor 메인 컨테이너 - 글래스모피즘 */
+.block-editor {
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.25);
+  border-radius: 20px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+/* 메인 텍스트 입력창 */
+.editor-textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 15px;
+  border: none;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 12px;
+  font-size: 15px;
+  font-family: inherit;
+  resize: vertical;
+  outline: none;
+  transition: all 0.3s ease;
+  color: rgba(0, 0, 0, 0.87);
+}
+
+.editor-textarea::placeholder {
+  color: rgba(0, 0, 0, 0.4);
+}
+
+.editor-textarea:focus {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(168, 218, 220, 0.5);
+  box-shadow: 0 0 0 3px rgba(168, 218, 220, 0.1);
+}
+
+.editor-textarea:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* 미디어 미리보기 그리드 */
+.media-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+  margin: 15px 0;
+}
+
+.media-preview-item {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  transition: transform 0.2s ease;
+}
+
+.media-preview-item:hover {
+  transform: scale(1.02);
+}
+
+.media-preview-item img,
+.media-preview-item video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* 영상 오버레이 아이콘 */
+.video-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 48px;
+  opacity: 0.9;
+  pointer-events: none;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* 미디어 제거 버튼 */
+.media-remove-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 20px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  line-height: 1;
+}
+
+.media-remove-btn:hover {
+  background: rgba(244, 67, 54, 0.9);
+  transform: scale(1.1);
+}
+
+/* 하단 툴바 */
+.editor-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 15px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  margin-top: 15px;
+}
+
+.media-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+/* 미디어 버튼 (페이스북 스타일) */
+.media-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.7);
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.media-btn:hover:not(.disabled) {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.media-btn.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.media-icon {
+  font-size: 20px;
+}
+
+.media-label {
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+/* 등록 버튼 - 글래스모피즘 */
+.submit-btn {
+  padding: 10px 28px;
+  background: linear-gradient(135deg, rgba(255,193,204,0.3) 0%, rgba(168,218,220,0.3) 100%);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  color: rgba(0, 0, 0, 0.87);
+  font-weight: bold;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 16px 0 rgba(31, 38, 135, 0.15);
+}
+
+.submit-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, rgba(255,193,204,0.5) 0%, rgba(168,218,220,0.5) 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px 0 rgba(31, 38, 135, 0.25);
+}
+
+.submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* 모바일 반응형 */
+@media (max-width: 768px) {
+  .block-editor {
+    padding: 15px;
+    border-radius: 16px;
+  }
+
+  .editor-textarea {
+    font-size: 16px; /* iOS 자동 줌 방지 */
+    padding: 12px;
+  }
+
+  .media-preview-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 8px;
+  }
+
+  .editor-toolbar {
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+  }
+
+  .media-buttons {
+    justify-content: space-around;
+    width: 100%;
+  }
+
+  .media-btn {
+    flex: 1;
+    justify-content: center;
+    padding: 10px 12px;
+  }
+
+  .media-label {
+    font-size: 12px;
+  }
+
+  .submit-btn {
+    width: 100%;
+    padding: 12px;
+  }
+
+  .video-overlay {
+    font-size: 32px;
+  }
+}
+
+/* 애니메이션 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.block-editor {
+  animation: fadeIn 0.3s ease;
+}
