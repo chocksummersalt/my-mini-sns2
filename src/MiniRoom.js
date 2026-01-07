@@ -176,10 +176,11 @@ const MiniRoom = () => {
   const backgroundImage = isMobile ? bgmobileImage : bgwebImage;
   
   // 배경 이미지 스타일 (이미지가 없을 경우를 대비)
+  // 데스크톱에서는 사이드바 너비(240px)만큼 오른쪽으로 이동
   const backgroundStyle = backgroundImage ? {
     backgroundImage: `url(${backgroundImage})`,
     backgroundSize: 'cover',
-    backgroundPosition: 'center',
+    backgroundPosition: isMobile ? 'center' : '240px center', // 데스크톱에서는 사이드바 공간만큼 이동
     backgroundRepeat: 'no-repeat',
     backgroundAttachment: 'fixed'
   } : {

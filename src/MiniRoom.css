@@ -14,18 +14,13 @@ body {
   min-height: 100vh;
   font-family: 'Arial', sans-serif;
   
-  /* 배경화면 설정 (전체 꽉 차게) */
-  background-image: url('/bgweb.png'); /* 기본 배경 이미지 */
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed; /* 스크롤해도 배경 고정 */
+  /* 배경화면 설정은 MiniRoom.js의 backgroundStyle에서 처리 */
   background-color: #f4f4f4; /* fallback 배경색 */
 }
 
-/* 콘텐츠 영역 */
+/* 콘텐츠 영역 - 사이드바가 밀어낸 위치에 고정 */
 .content-area {
-  margin-left: 0; /* 기본적으로 왼쪽 여백 없음 */
+  margin-left: 240px; /* 사이드바 너비만큼 항상 고정 */
   flex: 1; /* 남은 공간 다 쓰기 */
   padding: 40px;
   display: flex;
@@ -34,14 +29,11 @@ body {
   justify-content: flex-start; /* 상단부터 시작 */
   position: relative;
   z-index: 1;
-  transition: margin-left 0.3s ease-in-out, width 0.3s ease-in-out; /* 부드러운 전환 */
   box-sizing: border-box;
   overflow-x: hidden;
   min-height: 100vh;
-  width: 100%; /* 전체 너비 사용 */
+  width: calc(100% - 240px); /* 사이드바 너비 제외 */
 }
-
-/* 사이드바가 나타날 때 콘텐츠 영역이 자연스럽게 밀려남 (데스크톱만) - 이제 :has() 선택자로 처리 */
 
 /* 공통 탭 콘텐츠 스타일 - 글래스모피즘 */
 .tab-content {
