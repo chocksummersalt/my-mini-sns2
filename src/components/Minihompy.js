@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { auth, db } from '../firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
+import CommunityBoard from './CommunityBoard';
 import './Minihompy.css';
 
 const Minihompy = () => {
@@ -40,6 +41,11 @@ const Minihompy = () => {
       loadUserProfile();
     }
   }, [username]);
+
+  // Home 메뉴가 선택되면 커뮤니티 게시판 표시
+  if (activeMenu === 'Home') {
+    return <CommunityBoard />;
+  }
 
   return (
     <div className="minihompy-container">
