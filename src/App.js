@@ -5,6 +5,7 @@ import { auth, db } from './firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import Login from './components/Login';
 import MiniRoom from './MiniRoom';
+import Minihompy from './components/Minihompy';
 import './App.css';
 
 function App() {
@@ -52,9 +53,10 @@ function App() {
     <Router>
       <div className="App">
         <Routes>
-          <Route path="/login" element={!user ? <Login /> : <Navigate to={userUsername ? `/home/${userUsername}` : '/'} />} />
+          <Route path="/login" element={!user ? <Login /> : <Navigate to={userUsername ? `/minihompy/${userUsername}` : '/'} />} />
           <Route path="/home/:username" element={<MiniRoom />} />
-          <Route path="/" element={user && userUsername ? <Navigate to={`/home/${userUsername}`} /> : <Navigate to="/login" />} />
+          <Route path="/minihompy/:username" element={<Minihompy />} />
+          <Route path="/" element={user && userUsername ? <Navigate to={`/minihompy/${userUsername}`} /> : <Navigate to="/login" />} />
         </Routes>
       </div>
     </Router>
