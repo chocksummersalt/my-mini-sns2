@@ -42,8 +42,8 @@ const Minihompy = () => {
     }
   }, [username]);
 
-  // Home 메뉴가 선택되면 커뮤니티 게시판 표시
-  if (activeMenu === 'Home') {
+  // Community 메뉴가 선택되면 커뮤니티 게시판 표시
+  if (activeMenu === 'Community') {
     return <CommunityBoard />;
   }
 
@@ -162,7 +162,7 @@ const Minihompy = () => {
 
       {/* 오른쪽 네비게이션 메뉴 */}
       <div className="nav-menu">
-        {['Home', 'Profile', 'Jukebox', 'Minroom', 'Photo', 'Board', 'Paper', 'Visitor', 'Favorite'].map((menu) => (
+        {['Home', 'Profile', 'Jukebox', 'Minroom', 'Photo', 'Board', 'Paper', 'Visitor', 'Community', 'Favorite'].map((menu) => (
           <button
             key={menu}
             className={`nav-button ${activeMenu === menu ? 'active' : ''}`}
